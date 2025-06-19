@@ -682,8 +682,8 @@
     </footer>
 
     <script>
-        // CORS proxy for Railway n8n webhook
-        const WEBHOOK_URL = 'https://cors-anywhere.herokuapp.com/https://aifactchecker-production.up.railway.app/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
+        // Direct webhook URL - test if Railway CORS is now working
+        const WEBHOOK_URL = 'https://aifactchecker-production.up.railway.app/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
 
         // File upload handling
         function handleFileUpload(inputId, displayId) {
@@ -694,7 +694,21 @@
                 display.innerHTML = '';
                 const files = Array.from(e.target.files);
                 
+                if (files.length === 0) return;
+                
                 files.forEach((file, index) => {
+                    // Validate file type
+                    if (file.type !== 'application/pdf') {
+                        alert('Please select a PDF file.');
+                        return; // Don't clear input, just skip this file
+                    }
+                    
+                    // Validate file size (10MB limit)
+                    if (file.size > 10 * 1024 * 1024) {
+                        alert('File size must be less than 10MB.');
+                        return; // Don't clear input, just skip this file
+                    }
+                    
                     const fileItem = document.createElement('div');
                     fileItem.className = 'file-item';
                     fileItem.innerHTML = `
