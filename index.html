@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Fact Checker & Source Verification - The Messina Group</title>
+    <title>AI Fact Checker & Source Verification</title>
     <style>
         * {
             margin: 0;
@@ -683,8 +683,8 @@
     </footer>
 
     <script>
-        // Add port 5678 for n8n default
-        const WEBHOOK_URL = 'https://aifactchecker-production-4c57.up.railway.app:5678/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
+        // Remove port 5678 for Railway port mapping
+        const WEBHOOK_URL = 'https://aifactchecker-production-4c57.up.railway.app/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
 
         // File upload handling
         function handleFileUpload(inputId, displayId) {
@@ -771,7 +771,7 @@
             submitBtn.innerHTML = '⏳ Processing...';
             submitBtn.disabled = true;
             statusGroup.style.display = 'block';
-            statusText.textContent = 'Processing your document... This may take 1-2 minutes';
+            statusText.textContent = 'Processing your document...';
             resultsGroup.style.display = 'none';
             
             // Start SINGLE timer - only updates the status display
