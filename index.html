@@ -171,8 +171,8 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
-            max-width: 400px;
-            margin: 0 auto;
+            width: 100%;
+            min-height: 80px;
         }
 
         .file-upload-area:hover {
@@ -556,8 +556,8 @@
                     <p class="description">Upload the primary document you want to fact check (PDF format supported)</p>
                     <div class="file-upload-area" onclick="document.getElementById('mainDoc').click()">
                         <div class="upload-icon">📄</div>
-                        <div class="upload-text">Drop your document here or click to browse</div>
-                        <div class="upload-subtext">PDF files up to 10MB</div>
+                        <div class="upload-text">Click to browse or drag file here</div>
+                        <div class="upload-subtext">PDF up to 10MB</div>
                         <input type="file" id="mainDoc" name="file" class="file-input" accept=".pdf" required>
                     </div>
                     <div id="mainDocFiles" class="uploaded-files"></div>
