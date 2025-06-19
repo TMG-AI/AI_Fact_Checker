@@ -1,17 +1,10 @@
 FROM n8nio/n8n:latest
 
-USER root
+# Set environment variables for permissions
+ENV N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=false
 
-# Install any additional dependencies if needed
-RUN apk add --no-cache git
-
-USER node
-
-# Set work directory
-WORKDIR /home/node
-
-# Expose n8n port
+# Expose port
 EXPOSE 5678
 
-# Start n8n
-CMD ["n8n", "start"]
+# Use the default n8n startup
+CMD ["n8n"]
