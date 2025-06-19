@@ -4,7 +4,7 @@ A public-facing fact-checking workflow that allows users to upload PDF documents
 
 ## 🌐 Live Demo
 
-Visit the live application: [AI Fact Checker](https://yourusername.github.io/AI_Fact_Checker)
+Visit the live application: [AI Fact Checker](https://TMG-AI.github.io/AI_Fact_Checker)
 
 ## 🔧 System Overview
 
