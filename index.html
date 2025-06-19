@@ -554,7 +554,7 @@
                 <div class="form-group" id="mainDocGroup">
                     <label>Document to Fact Check</label>
                     <p class="description">Upload the primary document you want to fact check (PDF format supported)</p>
-                    <div class="file-upload-area" onclick="document.getElementById('mainDoc').click()">
+                    <div class="file-upload-area">
                         <div class="upload-icon">📄</div>
                         <div class="upload-text">Click to browse or drag file here</div>
                         <div class="upload-subtext">PDF up to 10MB</div>
@@ -682,8 +682,8 @@
     </footer>
 
     <script>
-        // Direct webhook URL - test if Railway CORS is now working
-        const WEBHOOK_URL = 'https://aifactchecker-production.up.railway.app/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
+        // Try corsproxy.io instead
+        const WEBHOOK_URL = 'https://corsproxy.io/?https://aifactchecker-production.up.railway.app/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
 
         // File upload handling
         function handleFileUpload(inputId, displayId) {
