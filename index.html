@@ -207,7 +207,7 @@
     }
     .source-input {
       width: 100%;
-      height: 80px;
+      height: 120px;
       padding: 0.75rem;
       border: 2px solid #e2e8f0;
       border-radius: 10px;
@@ -423,9 +423,14 @@
         <div class="form-group">
           <label>Source URLs (Optional)</label>
           <p class="description">Provide URLs to articles, studies, or websites that should be used as reference sources</p>
-          <textarea id="sourceUrls" class="source-input" placeholder="Enter URLs, one per line:
+          <textarea id="sourceUrls" name="sourceUrls" class="source-input" placeholder="Enter URLs, one per line:
+
 https://example.com/study1
-https://example.com/article2"></textarea>
+https://example.com/article2
+https://news.site.com/report3
+https://journal.com/research4
+
+Add as many sources as needed..."></textarea>
         </div>
 
         <div id="statusDisplay" class="status-display">
@@ -510,7 +515,7 @@ https://example.com/article2"></textarea>
   </footer>
 
   <script>
-    // All fixes applied including webhook URL and timer functionality
+    // Webhook URL matching your n8n workflow exactly
     const WEBHOOK_URL = 'https://aifactchecker-production.up.railway.app:5678/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
 
     function handleFileUpload(inputId, displayId) {
