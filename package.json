@@ -1,0 +1,22 @@
+{
+  "name": "n8n-railway-deployment",
+  "version": "1.0.0",
+  "description": "n8n deployment on Railway with PostgreSQL",
+  "main": "index.js",
+  "scripts": {
+    "start": "n8n start",
+    "dev": "n8n start"
+  },
+  "dependencies": {
+    "n8n": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "n8n",
+    "workflow",
+    "automation",
+    "railway"
+  ]
+}
