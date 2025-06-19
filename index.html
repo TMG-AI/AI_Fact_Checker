@@ -211,6 +211,7 @@
             height: 100%;
             opacity: 0;
             cursor: pointer;
+            z-index: 2;
         }
 
         .uploaded-files {
@@ -682,8 +683,8 @@
     </footer>
 
     <script>
-        // Try corsproxy.io instead
-        const WEBHOOK_URL = 'https://corsproxy.io/?https://aifactchecker-production.up.railway.app/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
+        // Use the new public domain Railway generated
+        const WEBHOOK_URL = 'https://aifactchecker-production-4c57.up.railway.app/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
 
         // File upload handling
         function handleFileUpload(inputId, displayId) {
@@ -738,29 +739,6 @@
 
         // Initialize file upload handlers
         handleFileUpload('mainDoc', 'mainDocFiles');
-
-        // Drag and drop functionality
-        document.querySelectorAll('.file-upload-area').forEach(area => {
-            area.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                area.classList.add('dragover');
-            });
-
-            area.addEventListener('dragleave', () => {
-                area.classList.remove('dragover');
-            });
-
-            area.addEventListener('drop', (e) => {
-                e.preventDefault();
-                area.classList.remove('dragover');
-                
-                const input = area.querySelector('.file-input');
-                if (input) {
-                    input.files = e.dataTransfer.files;
-                    input.dispatchEvent(new Event('change'));
-                }
-            });
-        });
 
         // Form submission with SINGLE timer
         document.getElementById('factCheckForm').addEventListener('submit', async function(e) {
