@@ -1,4 +1,8 @@
-<!DOCTYPE html>
+.source-input::placeholder {
+      color: #2d3748;
+      font-size: 0.9rem;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -209,16 +213,21 @@
       width: 100%;
       height: 120px;
       padding: 0.75rem;
-      border: 2px solid #e2e8f0;
+      border: 2px dashed #cbd5e0;
       border-radius: 10px;
-      font-family: inherit;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       resize: vertical;
-      font-size: 1rem;
+      font-size: 0.9rem;
       transition: border-color 0.3s;
+      line-height: 1.5;
     }
     .source-input:focus {
       outline: none;
       border-color: #4a90a4;
+    }
+    .source-input:hover {
+      border-color: #4a90a4;
+      background: #f1f9ff;
     }
     .submit-btn {
       background: linear-gradient(135deg, #2d5a87, #4a90a4);
@@ -423,14 +432,7 @@
         <div class="form-group">
           <label>Source URLs (Optional)</label>
           <p class="description">Provide URLs to articles, studies, or websites that should be used as reference sources</p>
-          <textarea id="sourceUrls" name="sourceUrls" class="source-input" placeholder="Enter URLs, one per line:
-
-https://example.com/study1
-https://example.com/article2
-https://news.site.com/report3
-https://journal.com/research4
-
-Add as many sources as needed..."></textarea>
+          <textarea id="sourceUrls" name="sourceUrls" class="source-input" placeholder="Enter URLs, one per line (optional)"></textarea>
         </div>
 
         <div id="statusDisplay" class="status-display">
