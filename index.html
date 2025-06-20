@@ -697,20 +697,23 @@
                 
                 if (files.length === 0) return;
                 
+                let validFiles = [];
+                
                 files.forEach((file, index) => {
                     // Validate file type
                     if (file.type !== 'application/pdf') {
                         alert('Please select a PDF file.');
-                        input.value = ''; // Clear the input
-                        return;
+                        return; // Skip this file but don't clear input
                     }
                     
                     // Validate file size (10MB limit)
                     if (file.size > 10 * 1024 * 1024) {
                         alert('File size must be less than 10MB.');
-                        input.value = ''; // Clear the input
-                        return;
+                        return; // Skip this file but don't clear input
                     }
+                    
+                    // File is valid, add to valid files
+                    validFiles.push(file);
                     
                     const fileItem = document.createElement('div');
                     fileItem.className = 'file-item';
@@ -719,24 +722,27 @@
                             <span class="file-name">${file.name}</span>
                             <span class="file-size">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                         </div>
-                        <button type="button" class="remove-file" onclick="removeFile('${inputId}', ${index})">×</button>
+                        <button type="button" class="remove-file" onclick="removeFile('${inputId}')">×</button>
                     `;
                     display.appendChild(fileItem);
                 });
+                
+                // If no valid files, clear the input
+                if (validFiles.length === 0) {
+                    input.value = '';
+                }
             });
         }
 
-        function removeFile(inputId, index) {
+        function removeFile(inputId) {
             const input = document.getElementById(inputId);
-            const dt = new DataTransfer();
-            const files = Array.from(input.files);
+            const display = document.getElementById(inputId.replace('mainDoc', 'mainDocFiles'));
             
-            files.forEach((file, i) => {
-                if (i !== index) dt.items.add(file);
-            });
+            // Clear the file input
+            input.value = '';
             
-            input.files = dt.files;
-            input.dispatchEvent(new Event('change'));
+            // Clear the display
+            display.innerHTML = '';
         }
 
         // Initialize file upload handlers
@@ -903,6 +909,8 @@
             function handleDrop(e) {
                 const dt = e.dataTransfer;
                 const files = dt.files;
+                
+                console.log('Files dropped:', files.length);
                 
                 if (files.length > 0) {
                     fileInput.files = files;
