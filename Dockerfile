@@ -1,20 +1,26 @@
-# Start from Alpine-based n8n image with shell support
-FROM n8nio/n8n:1.24.1
+# Use Debian base for shell tools support
+FROM node:18-slim
 
-# Switch to root to install shell tools needed by your agents
-USER root
+# Create app directory
+WORKDIR /app
 
-# Use Alpine’s package manager to install CLI tools
-RUN apk add --no-cache curl jq grep sed
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y curl jq grep sed gnupg && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Return to n8n user
-USER node
+# Install n8n globally
+RUN npm install --global n8n
 
-# Set port dynamically for Render (Render sets $PORT env var)
-ENV N8N_PORT=$PORT
-ENV WEBHOOK_URL=https://ai-fact-checker-5ksf.onrender.com/
-ENV N8N_HOST=0.0.0.0
-ENV N8N_PROTOCOL=http
+# Set environment
+ENV N8N_USER_FOLDER=/home/node/.n8n \
+    N8N_PORT=5678 \
+    N8N_PROTOCOL=http \
+    NODE_ENV=production
 
-# Start n8n on correct port
-CMD ["n8n", "start"]
+# Expose n8n port
+EXPOSE 5678
+
+# Start n8n
+CMD ["n8n"]
