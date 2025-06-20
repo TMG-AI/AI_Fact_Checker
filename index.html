@@ -789,12 +789,18 @@
                 console.log('FormData contents:', formData.get('file')?.name, 'Sources:', formData.get('sourceUrls'));
                 
                 // Send request to n8n webhook with proper CORS handling
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    body: formData,
-                    mode: 'cors',
-                    credentials: 'omit'
-                });
+                fetch(webhookUrl, {
+    method: 'POST',
+    body: formData
+})
+.then(response => response.json())
+.then(data => {
+    if (data.redirect) {
+        // Store report data and redirect
+        sessionStorage.setItem('reportData', data.reportData);
+        window.location.href = data.redirect;
+    }
+});
                 
                 console.log('Response status:', response.status);
                 console.log('Response headers:', [...response.headers.entries()]);
