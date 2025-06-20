@@ -1,20 +1,17 @@
-# Use the Debian-based n8n image to get apt-get support
-FROM n8nio/n8n:1.49.0-debian
+# Dockerfile for Render - n8n with shell tools
+FROM n8nio/n8n:latest
 
-# Switch to root to install tools
+# Install shell tools needed for your agents (e.g., curl, grep, jq, etc.)
 USER root
-
-# Install shell tools
 RUN apt-get update && \
     apt-get install -y curl jq grep sed && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Switch back to node user
 USER node
 
-# Set working directory for n8n
+# Ensure workflows and credentials persist
 ENV N8N_USER_FOLDER=/home/node/.n8n
 
-# Start n8n
+# Default CMD
 CMD ["n8n"]
