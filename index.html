@@ -692,25 +692,35 @@
             const display = document.getElementById(displayId);
             
             input.addEventListener('change', function(e) {
+                console.log('File input changed!');
+                console.log('Files selected:', e.target.files.length);
+                
                 display.innerHTML = '';
                 const files = Array.from(e.target.files);
                 
-                if (files.length === 0) return;
+                console.log('Files array:', files);
+                
+                if (files.length === 0) {
+                    console.log('No files found, returning');
+                    return;
+                }
                 
                 files.forEach((file, index) => {
-    // Validate file type
-    if (file.type !== 'application/pdf') {
-        alert('Please select a PDF file.');
-        input.value = ''; // Clear the input
-        return;
-    }
-    
-    // Validate file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-        alert('File size must be less than 10MB.');
-        input.value = ''; // Clear the input
-        return;
-    }
+                    console.log('Processing file:', file.name, 'Type:', file.type, 'Size:', file.size);
+                    
+                    // Validate file type
+                    if (file.type !== 'application/pdf') {
+                        alert('Please select a PDF file.');
+                        input.value = ''; // Clear the input
+                        return;
+                    }
+                    
+                    // Validate file size (10MB limit)
+                    if (file.size > 10 * 1024 * 1024) {
+                        alert('File size must be less than 10MB.');
+                        input.value = ''; // Clear the input
+                        return;
+                    }
                     
                     const fileItem = document.createElement('div');
                     fileItem.className = 'file-item';
@@ -788,89 +798,43 @@
             
             try {
                 console.log('Sending request to:', WEBHOOK_URL);
-                console.log('FormData contents:', formData.get('file')?.name, 'Sources:', formData.get('sourceUrls'));
                 
-                // Send request to n8n webhook with proper CORS handling
-                fetch(WEBHOOK_URL, {
-    method: 'POST',
-    body: formData
-})
-.then(response => response.text())
-.then(htmlContent => {
-    // Store HTML and redirect to report page
-    sessionStorage.setItem('reportData', htmlContent);
-    window.location.href = 'https://ai-fact-checker-six.vercel.app/report.html';
-});
-                
-                console.log('Response status:', response.status);
-                console.log('Response headers:', [...response.headers.entries()]);
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    body: formData
+                });
                 
                 // Clear timer
                 clearInterval(timer);
                 
                 if (!response.ok) {
-                    const errorText = await response.text();
-                    console.log('Error response body:', errorText);
-                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const result = await response.text();
-                console.log('Success response received, length:', result.length);
+                const htmlContent = await response.text();
                 
-                // Hide loading and show results
-                statusGroup.style.display = 'none';
-                resultsGroup.style.display = 'block';
-                
-                // Display results
-                resultsContent.innerHTML = result;
-                
-                // Reset button
-                submitBtn.innerHTML = '✅ Fact-Check Complete!';
-                submitBtn.disabled = false;
+                // Store HTML and redirect to report page
+                sessionStorage.setItem('reportData', htmlContent);
+                window.location.href = 'https://ai-fact-checker-six.vercel.app/report.html';
                 
             } catch (error) {
-                console.error('Detailed error:', error);
-                console.error('Error name:', error.name);
-                console.error('Error message:', error.message);
+                console.error('Error:', error);
                 
                 // Clear timer
                 clearInterval(timer);
                 
-                // Hide loading and show error
+                // Show error
                 statusGroup.style.display = 'none';
                 resultsGroup.style.display = 'block';
-                
-                let errorDetails = '';
-                if (error.name === 'TypeError' && error.message.includes('fetch')) {
-                    errorDetails = `
-                        <p><strong>Network/CORS Error Details:</strong></p>
-                        <ul>
-                            <li>This appears to be a network connectivity or CORS policy issue</li>
-                            <li>The Render webhook may not allow cross-origin requests from Vercel</li>
-                            <li>Check if the webhook URL is accessible: <a href="${WEBHOOK_URL}" target="_blank">${WEBHOOK_URL}</a></li>
-                            <li>Verify CORS settings in your Render n8n configuration</li>
-                        </ul>
-                    `;
-                } else {
-                    errorDetails = `<p><strong>Error Type:</strong> ${error.name}</p>`;
-                }
                 
                 resultsContent.innerHTML = `
                     <div class="error-message">
                         <h3>❌ Error Processing Document</h3>
                         <p><strong>Error:</strong> ${error.message}</p>
-                        ${errorDetails}
-                        <p><strong>Troubleshooting Steps:</strong></p>
-                        <ol>
-                            <li>Check your browser's developer console (F12) for more details</li>
-                            <li>Verify the webhook URL is accessible</li>
-                            <li>Ensure your Render n8n instance is running</li>
-                            <li>Check CORS settings if this is a cross-origin error</li>
-                        </ol>
+                        <p><strong>Error Type:</strong> ${error.name}</p>
                     </div>
                 `;
                 
-                // Reset button
                 submitBtn.innerHTML = '🔍 Start Fact Checking';
                 submitBtn.disabled = false;
             }
