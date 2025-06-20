@@ -697,23 +697,18 @@
                 
                 if (files.length === 0) return;
                 
-                let validFiles = [];
-                
                 files.forEach((file, index) => {
                     // Validate file type
                     if (file.type !== 'application/pdf') {
                         alert('Please select a PDF file.');
-                        return; // Skip this file but don't clear input
+                        return; // Don't clear input, just skip this file
                     }
                     
                     // Validate file size (10MB limit)
                     if (file.size > 10 * 1024 * 1024) {
                         alert('File size must be less than 10MB.');
-                        return; // Skip this file but don't clear input
+                        return; // Don't clear input, just skip this file
                     }
-                    
-                    // File is valid, add to valid files
-                    validFiles.push(file);
                     
                     const fileItem = document.createElement('div');
                     fileItem.className = 'file-item';
@@ -722,27 +717,24 @@
                             <span class="file-name">${file.name}</span>
                             <span class="file-size">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
                         </div>
-                        <button type="button" class="remove-file" onclick="removeFile('${inputId}')">×</button>
+                        <button type="button" class="remove-file" onclick="removeFile('${inputId}', ${index})">×</button>
                     `;
                     display.appendChild(fileItem);
                 });
-                
-                // If no valid files, clear the input
-                if (validFiles.length === 0) {
-                    input.value = '';
-                }
             });
         }
 
-        function removeFile(inputId) {
+        function removeFile(inputId, index) {
             const input = document.getElementById(inputId);
-            const display = document.getElementById(inputId.replace('mainDoc', 'mainDocFiles'));
+            const dt = new DataTransfer();
+            const files = Array.from(input.files);
             
-            // Clear the file input
-            input.value = '';
+            files.forEach((file, i) => {
+                if (i !== index) dt.items.add(file);
+            });
             
-            // Clear the display
-            display.innerHTML = '';
+            input.files = dt.files;
+            input.dispatchEvent(new Event('change'));
         }
 
         // Initialize file upload handlers
