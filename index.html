@@ -813,9 +813,10 @@
                 
                 const htmlContent = await response.text();
                 
-                // Store HTML and redirect to report page
-                sessionStorage.setItem('reportData', htmlContent);
-                window.location.href = 'https://ai-fact-checker-six.vercel.app/report.html';
+                // Open the report in a new tab
+const reportWindow = window.open('', '_blank', 'noopener,noreferrer');
+reportWindow.document.write(htmlContent);
+reportWindow.document.close();
                 
             } catch (error) {
                 console.error('Error:', error);
