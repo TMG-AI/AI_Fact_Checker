@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fact Check Report</title>
+</head>
+<body>
+    <div id="report-content">
+        Loading report...
+    </div>
+    
+    <script>
+        // Will receive and display the HTML report
+        const urlParams = new URLSearchParams(window.location.search);
+        const reportData = urlParams.get('data');
+        
+        if (reportData) {
+            document.getElementById('report-content').innerHTML = decodeURIComponent(reportData);
+        }
+    </script>
+</body>
+</html>
