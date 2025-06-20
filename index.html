@@ -794,6 +794,39 @@
         throw new Error(`Upload failed: ${response.status}`);
     }
 
+    const html = await response.text();
+    const blob = new Blob([html], { type: 'text/html' });
+    const blobUrl = URL.createObjectURL(blob);
+    window.open(blobUrl, '_blank');
+
+    // Reset UI
+    clearInterval(timer);
+    statusGroup.style.display = 'none';
+    resultsGroup.style.display = 'none';
+    submitBtn.innerHTML = '✅ Fact-Check Complete!';
+    submitBtn.disabled = false;
+
+} catch (error) {
+    console.error('Error:', error);
+
+    // Reset UI on error
+    clearInterval(timer);
+    statusGroup.style.display = 'none';
+    resultsGroup.style.display = 'block';
+
+    resultsContent.innerHTML = `
+        <div class="error-message">
+            <h3>❌ Error Processing Document</h3>
+            <p>There was an error processing your document: ${error.message}</p>
+            <p>Please try again or contact support if the problem persists.</p>
+        </div>
+    `;
+
+    submitBtn.innerHTML = '🔍 Start Fact Checking';
+    submitBtn.disabled = false;
+}
+
+
    const html = await response.text();
 const blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
 window.open(blobUrl, '_blank');
@@ -811,8 +844,6 @@ window.open(blobUrl, '_blank');
                 statusGroup.style.display = 'none';
                 resultsGroup.style.display = 'block';
                 
-                // Display results
-                resultsContent.innerHTML = result;
                 
                 // Reset button
                 submitBtn.innerHTML = '✅ Fact-Check Complete!';
