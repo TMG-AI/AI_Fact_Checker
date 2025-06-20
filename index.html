@@ -794,17 +794,18 @@
         throw new Error(`Upload failed: ${response.status}`);
     }
 
-    const html = await response.text();
-    const blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-    window.open(blobUrl, '_blank');                
+   const html = await response.text();
+const blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
+window.open(blobUrl, '_blank');
+                
                 // Clear timer
                 clearInterval(timer);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                };
                 
-                const result = await response.text();
+             
                 
                 // Hide loading and show results
                 statusGroup.style.display = 'none';
