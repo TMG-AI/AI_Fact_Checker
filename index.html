@@ -684,49 +684,31 @@
 
     <script>
         // Railway routes to internal port automatically
-        const WEBHOOK_URL = 'https://ai-fact-checker-5ksf.onrender.com/webhook/fact-check-upload';
+        const WEBHOOK_URL = 'https://aifactchecker-production-4c57.up.railway.app/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
 
         // File upload handling
         function handleFileUpload(inputId, displayId) {
             const input = document.getElementById(inputId);
             const display = document.getElementById(displayId);
             
-            if (!input || !display) {
-                console.error('Could not find input or display elements:', inputId, displayId);
-                return;
-            }
-            
-            console.log('Setting up file upload handler for:', inputId);
-            
             input.addEventListener('change', function(e) {
-                console.log('File input changed, files:', e.target.files.length);
-                
                 display.innerHTML = '';
                 const files = Array.from(e.target.files);
                 
-                if (files.length === 0) {
-                    console.log('No files selected');
-                    return;
-                }
+                if (files.length === 0) return;
                 
                 files.forEach((file, index) => {
-                    console.log('Processing file:', file.name, 'Type:', file.type, 'Size:', file.size);
-                    
                     // Validate file type
                     if (file.type !== 'application/pdf') {
                         alert('Please select a PDF file.');
-                        console.log('File rejected - not PDF, type was:', file.type);
                         return; // Don't clear input, just skip this file
                     }
                     
                     // Validate file size (10MB limit)
                     if (file.size > 10 * 1024 * 1024) {
                         alert('File size must be less than 10MB.');
-                        console.log('File rejected - too large:', file.size);
                         return; // Don't clear input, just skip this file
                     }
-                    
-                    console.log('File accepted, creating display element');
                     
                     const fileItem = document.createElement('div');
                     fileItem.className = 'file-item';
@@ -738,11 +720,8 @@
                         <button type="button" class="remove-file" onclick="removeFile('${inputId}', ${index})">×</button>
                     `;
                     display.appendChild(fileItem);
-                    console.log('File display element added to DOM');
                 });
             });
-            
-            console.log('File upload handler setup complete');
         }
 
         function removeFile(inputId, index) {
@@ -758,152 +737,101 @@
             input.dispatchEvent(new Event('change'));
         }
 
-        // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing file upload handlers...');
+        // Initialize file upload handlers
+        handleFileUpload('mainDoc', 'mainDocFiles');
+
+        // Form submission with SINGLE timer
+        document.getElementById('factCheckForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            // Check if elements exist
-            const mainDocInput = document.getElementById('mainDoc');
-            const mainDocFiles = document.getElementById('mainDocFiles');
-            const factCheckForm = document.getElementById('factCheckForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const statusGroup = document.getElementById('statusGroup');
+            const statusText = document.getElementById('statusText');
+            const loadingTimer = document.getElementById('loadingTimer');
+            const resultsGroup = document.getElementById('resultsGroup');
+            const resultsContent = document.getElementById('resultsContent');
             
-            console.log('mainDoc element:', mainDocInput);
-            console.log('mainDocFiles element:', mainDocFiles);
-            console.log('factCheckForm element:', factCheckForm);
+            // Get form data
+            const formData = new FormData();
+            const fileInput = document.getElementById('mainDoc');
+            const sourceUrls = document.getElementById('sourceUrls').value;
             
-            if (mainDocInput && mainDocFiles) {
-                handleFileUpload('mainDoc', 'mainDocFiles');
-                console.log('File upload handler initialized successfully');
-            } else {
-                console.error('Required elements not found!');
+            if (!fileInput.files[0]) {
+                alert('Please select a PDF file to upload.');
+                return;
             }
             
-            // Form submission handler
-            if (factCheckForm) {
-                factCheckForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    
-                    const submitBtn = document.getElementById('submitBtn');
-                    const statusGroup = document.getElementById('statusGroup');
-                    const statusText = document.getElementById('statusText');
-                    const loadingTimer = document.getElementById('loadingTimer');
-                    const resultsGroup = document.getElementById('resultsGroup');
-                    const resultsContent = document.getElementById('resultsContent');
-                    
-                    // Get form data
-                    const formData = new FormData();
-                    const fileInput = document.getElementById('mainDoc');
-                    const sourceUrls = document.getElementById('sourceUrls').value;
-                    
-                    if (!fileInput.files[0]) {
-                        alert('Please select a PDF file to upload.');
-                        return;
-                    }
-                    
-                    // Append file and source URLs
-                    formData.append('file', fileInput.files[0]);
-                    if (sourceUrls.trim()) {
-                        formData.append('sourceUrls', sourceUrls.trim());
-                    }
-                    
-                    // Show loading state 
-                    submitBtn.innerHTML = '⏳ Processing...';
-                    submitBtn.disabled = true;
-                    statusGroup.style.display = 'block';
-                    statusText.textContent = 'Processing your document...';
-                    resultsGroup.style.display = 'none';
-                    
-                    // Start timer
-                    const startTime = Date.now();
-                    const timer = setInterval(() => {
-                        const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                        const minutes = Math.floor(elapsed / 60);
-                        const seconds = elapsed % 60;
-                        const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                        loadingTimer.textContent = timeString;
-                    }, 1000);
-                    
-                    try {
-                        const response = await fetch(WEBHOOK_URL, {
-                            method: 'POST',
-                            body: formData
-                        });
-
-                        // Clear timer first
-                        clearInterval(timer);
-
-                        if (!response.ok) {
-                            throw new Error(`Upload failed: ${response.status} ${response.statusText}`);
-                        }
-
-                        // Check if response is HTML (for opening in new tab) or JSON (for displaying results)
-                        const contentType = response.headers.get('content-type');
-                        
-                        if (contentType && contentType.includes('text/html')) {
-                            // Handle HTML response - open in new tab
-                            const html = await response.text();
-                            const blob = new Blob([html], { type: 'text/html' });
-                            const blobUrl = URL.createObjectURL(blob);
-                            window.open(blobUrl, '_blank');
-                            
-                            // Show success message
-                            statusGroup.style.display = 'none';
-                            resultsGroup.style.display = 'block';
-                            resultsContent.innerHTML = `
-                                <div class="success-message">
-                                    <h3>✅ Fact-Check Complete!</h3>
-                                    <p>Your fact-check results have been opened in a new tab.</p>
-                                </div>
-                            `;
-                        } else {
-                            // Handle JSON response - display in results section
-                            const result = await response.json();
-                            
-                            statusGroup.style.display = 'none';
-                            resultsGroup.style.display = 'block';
-                            resultsContent.innerHTML = `
-                                <div class="success-message">
-                                    <h3>✅ Fact-Check Results</h3>
-                                    <pre style="white-space: pre-wrap; font-family: 'Segoe UI', sans-serif;">${JSON.stringify(result, null, 2)}</pre>
-                                </div>
-                            `;
-                        }
-                        
-                        // Reset button
-                        submitBtn.innerHTML = '✅ Fact-Check Complete!';
-                        submitBtn.disabled = false;
-                        
-                    } catch (error) {
-                        console.error('Error:', error);
-                        
-                        // Clear timer
-                        clearInterval(timer);
-                        
-                        // Hide loading and show error
-                        statusGroup.style.display = 'none';
-                        resultsGroup.style.display = 'block';
-                        
-                        resultsContent.innerHTML = `
-                            <div class="error-message">
-                                <h3>❌ Error Processing Document</h3>
-                                <p><strong>Error:</strong> ${error.message}</p>
-                                <p>Please check the following:</p>
-                                <ul>
-                                    <li>Make sure your PDF file is valid and not corrupted</li>
-                                    <li>Check that your internet connection is stable</li>
-                                    <li>Verify that the webhook URL is accessible</li>
-                                    <li>Try again in a few moments</li>
-                                </ul>
-                                <p>If the problem persists, please contact support.</p>
-                            </div>
-                        `;
-                        
-                        // Reset button
-                        submitBtn.innerHTML = '🔍 Start Fact Checking';
-                        submitBtn.disabled = false;
-                    }
+            // Append file and source URLs
+            formData.append('file', fileInput.files[0]);
+            if (sourceUrls.trim()) {
+                formData.append('sourceUrls', sourceUrls.trim());
+            }
+            
+            // Show loading state 
+            submitBtn.innerHTML = '⏳ Processing...';
+            submitBtn.disabled = true;
+            statusGroup.style.display = 'block';
+            statusText.textContent = 'Processing your document...';
+            resultsGroup.style.display = 'none';
+            
+            // Start SINGLE timer - only updates the status display
+            const startTime = Date.now();
+            const timer = setInterval(() => {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                loadingTimer.textContent = timeString;
+            }, 1000);
+            
+            try {
+                // Send request to n8n webhook through CORS proxy
+                const response = await fetch(WEBHOOK_URL, {
+                    method: 'POST',
+                    body: formData
                 });
-                console.log('Form submission handler initialized');
+                
+                // Clear timer
+                clearInterval(timer);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.text();
+                
+                // Hide loading and show results
+                statusGroup.style.display = 'none';
+                resultsGroup.style.display = 'block';
+                
+                // Display results
+                resultsContent.innerHTML = result;
+                
+                // Reset button
+                submitBtn.innerHTML = '✅ Fact-Check Complete!';
+                submitBtn.disabled = false;
+                
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Clear timer
+                clearInterval(timer);
+                
+                // Hide loading and show error
+                statusGroup.style.display = 'none';
+                resultsGroup.style.display = 'block';
+                
+                resultsContent.innerHTML = `
+                    <div class="error-message">
+                        <h3>❌ Error Processing Document</h3>
+                        <p>There was an error processing your document: ${error.message}</p>
+                        <p>Please try again or contact support if the problem persists.</p>
+                    </div>
+                `;
+                
+                // Reset button
+                submitBtn.innerHTML = '🔍 Start Fact Checking';
+                submitBtn.disabled = false;
             }
         });
 
@@ -920,3 +848,6 @@
                 }
             });
         });
+    </script>
+</body>
+</html>
