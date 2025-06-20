@@ -791,7 +791,7 @@
                 console.log('FormData contents:', formData.get('file')?.name, 'Sources:', formData.get('sourceUrls'));
                 
                 // Send request to n8n webhook with proper CORS handling
-                fetch(fetch(WEBHOOK_URL, {
+                fetch(WEBHOOK_URL, {
     method: 'POST',
     body: formData
 })
