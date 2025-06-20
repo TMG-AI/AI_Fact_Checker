@@ -698,17 +698,19 @@
                 if (files.length === 0) return;
                 
                 files.forEach((file, index) => {
-                    // Validate file type
-                    if (file.type !== 'application/pdf') {
-                        alert('Please select a PDF file.');
-                        return; // Don't clear input, just skip this file
-                    }
-                    
-                    // Validate file size (10MB limit)
-                    if (file.size > 10 * 1024 * 1024) {
-                        alert('File size must be less than 10MB.');
-                        return; // Don't clear input, just skip this file
-                    }
+    // Validate file type
+    if (file.type !== 'application/pdf') {
+        alert('Please select a PDF file.');
+        input.value = ''; // Clear the input
+        return;
+    }
+    
+    // Validate file size (10MB limit)
+    if (file.size > 10 * 1024 * 1024) {
+        alert('File size must be less than 10MB.');
+        input.value = ''; // Clear the input
+        return;
+    }
                     
                     const fileItem = document.createElement('div');
                     fileItem.className = 'file-item';
