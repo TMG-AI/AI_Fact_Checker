@@ -826,11 +826,6 @@
     submitBtn.disabled = false;
 }
 
-
-   const html = await response.text();
-const blobUrl = URL.createObjectURL(new Blob([html], { type: 'text/html' }));
-window.open(blobUrl, '_blank');
-                
                 // Clear timer
                 clearInterval(timer);
                 
