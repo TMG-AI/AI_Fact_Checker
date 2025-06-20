@@ -685,6 +685,10 @@
     <script>
         // Railway routes to internal port automatically
         const WEBHOOK_URL = 'https://aifactchecker-production-4c57.up.railway.app/webhook-test/02187aa1-b852-469f-bf19-5eed43e92011';
+        const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/';
+        
+        // Use CORS proxy for now
+        const PROXIED_WEBHOOK_URL = CORS_PROXY + WEBHOOK_URL;
 
         // File upload handling
         function handleFileUpload(inputId, displayId) {
@@ -785,20 +789,33 @@
             }, 1000);
             
             try {
+                console.log('Sending request to:', PROXIED_WEBHOOK_URL);
+                console.log('FormData contents:', formData.get('file')?.name, 'Sources:', formData.get('sourceUrls'));
+                
                 // Send request to n8n webhook through CORS proxy
-                const response = await fetch(WEBHOOK_URL, {
+                const response = await fetch(PROXIED_WEBHOOK_URL, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    // Add headers to help with CORS
+                    headers: {
+                        'Accept': '*/*'
+                    }
                 });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', [...response.headers.entries()]);
                 
                 // Clear timer
                 clearInterval(timer);
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorText = await response.text();
+                    console.log('Error response body:', errorText);
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
                 }
                 
                 const result = await response.text();
+                console.log('Success response received, length:', result.length);
                 
                 // Hide loading and show results
                 statusGroup.style.display = 'none';
@@ -812,7 +829,9 @@
                 submitBtn.disabled = false;
                 
             } catch (error) {
-                console.error('Error:', error);
+                console.error('Detailed error:', error);
+                console.error('Error name:', error.name);
+                console.error('Error message:', error.message);
                 
                 // Clear timer
                 clearInterval(timer);
@@ -821,11 +840,33 @@
                 statusGroup.style.display = 'none';
                 resultsGroup.style.display = 'block';
                 
+                let errorDetails = '';
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    errorDetails = `
+                        <p><strong>Network/CORS Error Details:</strong></p>
+                        <ul>
+                            <li>This appears to be a network connectivity or CORS policy issue</li>
+                            <li>The Render webhook may not allow cross-origin requests from Vercel</li>
+                            <li>Check if the webhook URL is accessible: <a href="${WEBHOOK_URL}" target="_blank">${WEBHOOK_URL}</a></li>
+                            <li>Verify CORS settings in your Render n8n configuration</li>
+                        </ul>
+                    `;
+                } else {
+                    errorDetails = `<p><strong>Error Type:</strong> ${error.name}</p>`;
+                }
+                
                 resultsContent.innerHTML = `
                     <div class="error-message">
                         <h3>❌ Error Processing Document</h3>
-                        <p>There was an error processing your document: ${error.message}</p>
-                        <p>Please try again or contact support if the problem persists.</p>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        ${errorDetails}
+                        <p><strong>Troubleshooting Steps:</strong></p>
+                        <ol>
+                            <li>Check your browser's developer console (F12) for more details</li>
+                            <li>Verify the webhook URL is accessible</li>
+                            <li>Ensure your Render n8n instance is running</li>
+                            <li>Check CORS settings if this is a cross-origin error</li>
+                        </ol>
                     </div>
                 `;
                 
