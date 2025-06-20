@@ -793,13 +793,11 @@
     method: 'POST',
     body: formData
 })
-.then(response => response.json())
-.then(data => {
-    if (data.redirect) {
-        // Store report data and redirect
-        sessionStorage.setItem('reportData', data.reportData);
-        window.location.href = data.redirect;
-    }
+.then(response => response.text())
+.then(htmlContent => {
+    // Store HTML and redirect to report page
+    sessionStorage.setItem('reportData', htmlContent);
+    window.location.href = 'https://ai-fact-checker-six.vercel.app/report.html';
 });
                 
                 console.log('Response status:', response.status);
