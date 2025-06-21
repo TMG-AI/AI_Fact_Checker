@@ -692,13 +692,6 @@
                 formData.append('sourceUrls', sourceUrls.trim());
             }
             
-            // Open window BEFORE fetch to avoid popup blockers
-            const reportWindow = window.open('about:blank', '_blank', 'noopener,noreferrer');
-            if (!reportWindow) {
-                alert('Please allow popups for this site to view the report in a new tab.');
-                return;
-            }
-            
             // Show loading state 
             submitBtn.innerHTML = '⏳ Processing...';
             submitBtn.disabled = true;
@@ -727,15 +720,15 @@
                 clearInterval(timer);
                 
                 if (!response.ok) {
-                    reportWindow.close();
+                  
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const htmlContent = await response.text();
-                
-                // Write HTML to the already-opened window
-                reportWindow.document.write(htmlContent);
-                reportWindow.document.close();
+
+// Encode HTML and redirect to report page
+const encodedHtml = encodeURIComponent(htmlContent);
+window.location.href = `https://ai-fact-checker-six.vercel.app/report.html?data=${encodedHtml}`;
                 
                 // Update the form UI
                 statusText.textContent = '✅ Report opened in a new tab.';
