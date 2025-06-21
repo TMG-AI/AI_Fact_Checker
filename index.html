@@ -219,18 +219,6 @@
             font-size: 1.2rem;
             padding: 0.25rem;
         }
-        .email-input {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        .email-input:focus {
-            outline: none;
-            border-color: #4a90a4;
-        }
         .submit-btn {
             background: linear-gradient(135deg, #2d5a87, #4a90a4);
             color: white;
@@ -365,40 +353,7 @@
         .footer-links a:hover {
             opacity: 1;
         }
-        /* Responsive */
-        @media (max-width: 768px) {
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-            .hero .subtitle {
-                font-size: 1.1rem;
-            }
-            .upload-form {
-                padding: 2rem;
-            }
-            .section-header h2 {
-                font-size: 2rem;
-            }
-        }
         /* Loading Animation */
-        .loading {
-            display: none;
-            text-align: center;
-            margin-top: 1rem;
-        }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #4a90a4;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         .status-display {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -448,7 +403,7 @@
             margin-top: 1rem;
         }
 
-        /* DASHBOARD CSS - ADDED FOR NEW FUNCTIONALITY */
+        /* DASHBOARD CSS */
         .dashboard {
             padding: 30px 20px;
             background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
@@ -736,28 +691,33 @@
         .explanation strong {
             color: #2c3e50;
         }
-        
+
+        /* Responsive */
         @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            .hero .subtitle {
+                font-size: 1.1rem;
+            }
+            .upload-form {
+                padding: 2rem;
+            }
+            .section-header h2 {
+                font-size: 2rem;
+            }
             .verdict-cards {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
             .claim-header {
                 flex-direction: column;
                 align-items: stretch;
                 text-align: center;
                 gap: 10px;
             }
-            
             .quick-actions {
                 flex-direction: column;
             }
-        }
-        
-        @media print {
-            .no-print { display: none !important; }
-            .pdf-only { display: block !important; }
-            body { background: white; }
         }
     </style>
 </head>
@@ -835,7 +795,7 @@
                 </button>
             </form>
 
-            <!-- NEW: Results Dashboard Container -->
+            <!-- Results Dashboard Container -->
             <div id="fact-check-results" style="display: none;">
                 <!-- Dashboard content will be injected here -->
             </div>
@@ -916,355 +876,23 @@
             <p style="font-size: 0.9rem; opacity: 0.6;">&copy; 2025 The Messina Group. All rights reserved.</p>
         </div>
     </footer>
+    
     <script>
-        // Update to use Render webhook URL
-        const WEBHOOK_URL = 'https://ai-fact-checker-5ksf.onrender.com/webhook/fact-check-upload';
-        
-        // Global variable to store report data
-        let currentReportData = null;
+        // Basic JavaScript only - no modern syntax
+        var WEBHOOK_URL = 'https://ai-fact-checker-5ksf.onrender.com/webhook/fact-check-upload';
+        var currentReportData = null;
 
-        // Function to display results dashboard
         function displayResults(reportData) {
             currentReportData = reportData;
-            
-            const resultsDiv = document.getElementById('fact-check-results');
-            resultsDiv.innerHTML = generateDashboardHTML(reportData);
-            resultsDiv.style.display = 'block';
-            
-            // Scroll to results
-            resultsDiv.scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('fact-check-results').innerHTML = 'Dashboard functionality will be added';
+            document.getElementById('fact-check-results').style.display = 'block';
         }
 
-        // Generate the dashboard HTML
-        function generateDashboardHTML(data) {
-            return `
-                <div class="dashboard">
-                    <h2>Results Summary</h2>
-                    
-                    <div class="document-meta">
-                        <h3>Document Details</h3>
-                        <div class="meta-grid">
-                            <div class="meta-item">
-                                <span class="meta-label">Title:</span>
-                                <span>${data.summary.documentTitle}</span>
-                            </div>
-                            <div class="meta-item">
-                                <span class="meta-label">Total Claims:</span>
-                                <span>${data.summary.totalClaims} analyzed</span>
-                            </div>
-                            <div class="meta-item">
-                                <span class="meta-label">Generated:</span>
-                                <span>${data.summary.reportDate}</span>
-                            </div>
-                            <div class="meta-item">
-                                <span class="meta-label">Sources Used:</span>
-                                <span>${data.summary.sourcesUsed} verified</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="verdict-cards">
-                        <div class="verdict-card true" onclick="showClaims('true')">
-                            <div class="verdict-number">${data.verdictCounts.true}</div>
-                            <div class="verdict-label">True (${((data.verdictCounts.true/data.summary.totalClaims)*100).toFixed(1)}%)</div>
-                        </div>
-                        
-                        <div class="verdict-card false" onclick="showClaims('false')">
-                            <div class="verdict-number">${data.verdictCounts.false}</div>
-                            <div class="verdict-label">False (${((data.verdictCounts.false/data.summary.totalClaims)*100).toFixed(1)}%)</div>
-                        </div>
-                        
-                        <div class="verdict-card partially-true" onclick="showClaims('partial')">
-                            <div class="verdict-number">${data.verdictCounts.partial}</div>
-                            <div class="verdict-label">Part True (${((data.verdictCounts.partial/data.summary.totalClaims)*100).toFixed(1)}%)</div>
-                        </div>
-                        
-                        <div class="verdict-card unverifiable" onclick="showClaims('unverifiable')">
-                            <div class="verdict-number">${data.verdictCounts.unverifiable}</div>
-                            <div class="verdict-label">Unverified (${((data.verdictCounts.unverifiable/data.summary.totalClaims)*100).toFixed(1)}%)</div>
-                        </div>
-                    </div>
-                    
-                    <div class="quick-actions no-print">
-                        <button class="action-btn" onclick="downloadPDF()">
-                            📄 Download PDF Report
-                        </button>
-                        <button class="action-btn secondary" onclick="showAllSources()">
-                            🔗 View All Sources
-                        </button>
-                        <button class="action-btn secondary" onclick="showClaims('all')">
-                            📋 View All Claims
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="detailed-claims" class="detailed-claims" style="display: none;">
-                    <a href="#" class="back-btn no-print" onclick="showDashboard()">← Back to Summary</a>
-                    <h2 id="claims-title">Claims</h2>
-                    <div id="claims-content"></div>
-                </div>
-            `;
-        }
-
-        // Dashboard interaction functions
-        function showClaims(type) {
-            const dashboard = document.querySelector('.dashboard');
-            const detailedClaims = document.getElementById('detailed-claims');
-            const claimsTitle = document.getElementById('claims-title');
-            const claimsContent = document.getElementById('claims-content');
-            
-            dashboard.style.display = 'none';
-            detailedClaims.style.display = 'block';
-            
-            const titles = {
-                'true': `True Claims (${currentReportData.verdictCounts.true})`,
-                'false': `False Claims (${currentReportData.verdictCounts.false})`,
-                'partial': `Partially True Claims (${currentReportData.verdictCounts.partial})`,
-                'unverifiable': `Unverifiable Claims (${currentReportData.verdictCounts.unverifiable})`,
-                'all': `All Claims (${currentReportData.summary.totalClaims})`
-            };
-            
-            claimsTitle.textContent = titles[type];
-            claimsContent.innerHTML = generateClaimsHTML(currentReportData.claims[type] || currentReportData.claims.all);
-        }
-
-        function generateClaimsHTML(claims) {
-            return claims.map((claim, index) => `
-                <div class="claim">
-                    <div class="claim-header">
-                        <span class="claim-number">Claim ${index + 1}</span>
-                        <span class="verdict verdict-${claim.final_verdict.toLowerCase().replace(' ', '-')}">${claim.final_verdict === 'Partially True' ? '⚠️ Part True' : claim.final_verdict}</span>
-                    </div>
-                    <div class="claim-text">
-                        <strong>Claim:</strong> ${claim.claim_text}
-                    </div>
-                    ${claim.explanation ? `
-                        <div class="explanation">
-                            <strong>Analysis:</strong> ${claim.explanation}
-                        </div>
-                    ` : ''}
-                </div>
-            `).join('');
-        }
-
-        function showDashboard() {
-            document.querySelector('.dashboard').style.display = 'block';
-            document.getElementById('detailed-claims').style.display = 'none';
-        }
-
-        function downloadPDF() {
-            if (!currentReportData || !currentReportData.fullReportHTML) {
-                alert('No report data available for PDF generation.');
-                return;
-            }
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                ${currentReportData.fullReportHTML}
-                <script>
-                    window.onload = function() {
-                        setTimeout(() => {
-                            window.print();
-                        }, 500);
-                    }
-                </script>
-            `);
-            printWindow.document.close();
-        }
-
-        function showAllSources() {
-            if (!currentReportData || !currentReportData.allSources) {
-                alert('No source data available.');
-                return;
-            }
-            
-            const sourcesWindow = window.open('', '_blank');
-            sourcesWindow.document.write(`
-                <html>
-                    <head><title>Source References</title></head>
-                    <body style="font-family: Arial, sans-serif; padding: 20px;">
-                        <h2>Source References (${currentReportData.allSources.length} sources)</h2>
-                        <ul>
-                            ${currentReportData.allSources.map(source => `<li><a href="${source}" target="_blank">${source}</a></li>`).join('')}
-                        </ul>
-                    </body>
-                </html>
-            `);
-            sourcesWindow.document.close();
-        }
-
-        // File upload handling
-        function handleFileUpload(inputId, displayId) {
-            const input = document.getElementById(inputId);
-            const display = document.getElementById(displayId);
-            
-            input.addEventListener('change', function(e) {
-                console.log('File input changed!');
-                console.log('Files selected:', e.target.files.length);
-                
-                display.innerHTML = '';
-                const files = Array.from(e.target.files);
-                
-                console.log('Files array:', files);
-                
-                if (files.length === 0) {
-                    console.log('No files found, returning');
-                    return;
-                }
-                
-                files.forEach((file, index) => {
-                    console.log('Processing file:', file.name, 'Type:', file.type, 'Size:', file.size);
-                    
-                    // Validate file type
-                    if (file.type !== 'application/pdf') {
-                        alert('Please select a PDF file.');
-                        input.value = ''; // Clear the input
-                        return;
-                    }
-                    
-                    // Validate file size (10MB limit)
-                    if (file.size > 10 * 1024 * 1024) {
-                        alert('File size must be less than 10MB.');
-                        input.value = ''; // Clear the input
-                        return;
-                    }
-                    
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'file-item';
-                    fileItem.innerHTML = `
-                        <div class="file-info">
-                            <span class="file-name">${file.name}</span>
-                            <span class="file-size">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                        </div>
-                        <button type="button" class="remove-file" onclick="removeFile('${inputId}', ${index})">×</button>
-                    `;
-                    display.appendChild(fileItem);
-                });
-            });
-        }
-        function removeFile(inputId, index) {
-            const input = document.getElementById(inputId);
-            const dt = new DataTransfer();
-            const files = Array.from(input.files);
-            
-            files.forEach((file, i) => {
-                if (i !== index) dt.items.add(file);
-            });
-            
-            input.files = dt.files;
-            input.dispatchEvent(new Event('change'));
-        }
-        // Initialize file upload handlers
-        handleFileUpload('mainDoc', 'mainDocFiles');
-        
-        // Form submission with dashboard integration
-        document.getElementById('factCheckForm').addEventListener('submit', async function(e) {
+        // Form submission
+        document.getElementById('factCheckForm').onsubmit = function(e) {
             e.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const statusGroup = document.getElementById('statusGroup');
-            const statusText = document.getElementById('statusText');
-            const loadingTimer = document.getElementById('loadingTimer');
-            const resultsGroup = document.getElementById('resultsGroup');
-            const resultsContent = document.getElementById('resultsContent');
-            
-            // Get form data
-            const formData = new FormData();
-            const fileInput = document.getElementById('mainDoc');
-            const sourceUrls = document.getElementById('sourceUrls').value;
-            
-            if (!fileInput.files[0]) {
-                alert('Please select a PDF file to upload.');
-                return;
-            }
-            
-            // Append file and source URLs
-            formData.append('file', fileInput.files[0]);
-            if (sourceUrls.trim()) {
-                formData.append('sourceUrls', sourceUrls.trim());
-            }
-            
-            // Show loading state 
-            submitBtn.innerHTML = '⏳ Processing...';
-            submitBtn.disabled = true;
-            statusGroup.style.display = 'block';
-            statusText.textContent = 'Processing your document...';
-            resultsGroup.style.display = 'none';
-            
-            // Hide any previous results
-            document.getElementById('fact-check-results').style.display = 'none';
-            
-            // Start timer
-            const startTime = Date.now();
-            const timer = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const minutes = Math.floor(elapsed / 60);
-                const seconds = elapsed % 60;
-                const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                loadingTimer.textContent = timeString;
-            }, 1000);
-            
-            try {
-                console.log('Sending request to:', WEBHOOK_URL);
-                
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                clearInterval(timer);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const reportData = await response.json();
-                
-                // Hide loading status
-                statusGroup.style.display = 'none';
-                
-                // Show dashboard with results
-                displayResults(reportData);
-                
-                // Update the form UI
-                submitBtn.innerHTML = '🔍 Start Fact Checking';
-                submitBtn.disabled = false;
-                
-            } catch (error) {
-                console.error('Error:', error);
-                
-                clearInterval(timer);
-                
-                // Show error
-                statusGroup.style.display = 'none';
-                resultsGroup.style.display = 'block';
-                
-                resultsContent.innerHTML = `
-                    <div class="error-message">
-                        <h3>❌ Error Processing Document</h3>
-                        <p><strong>Error:</strong> ${error.message}</p>
-                        <p><strong>Error Type:</strong> ${error.name}</p>
-                    </div>
-                `;
-                
-                submitBtn.innerHTML = '🔍 Start Fact Checking';
-                submitBtn.disabled = false;
-            }
-        });
-        
-        // Smooth scrolling for navigation links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
+            alert('Form functionality will be added in next version');
+        };
     </script>
 </body>
 </html>
