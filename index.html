@@ -812,137 +812,138 @@
         </div>
     </footer>
     <script>
+    <script>
         // Update to use Render webhook URL
         const WEBHOOK_URL = 'https://ai-fact-checker-5ksf.onrender.com/webhook/fact-check-upload';
         
-// Dashboard functionality
-var currentReportData = null;
+        // Dashboard functionality
+        var currentReportData = null;
 
-function displayResults(reportData) {
-    currentReportData = reportData;
-    document.getElementById('fact-check-results').innerHTML = generateDashboardHTML(reportData);
-    document.getElementById('fact-check-results').style.display = 'block';
-    document.getElementById('fact-check-results').scrollIntoView({ behavior: 'smooth' });
-}
+        function displayResults(reportData) {
+            currentReportData = reportData;
+            document.getElementById('fact-check-results').innerHTML = generateDashboardHTML(reportData);
+            document.getElementById('fact-check-results').style.display = 'block';
+            document.getElementById('fact-check-results').scrollIntoView({ behavior: 'smooth' });
+        }
 
-function generateDashboardHTML(data) {
-    var truePercent = ((data.verdictCounts.true/data.summary.totalClaims)*100).toFixed(1);
-    var falsePercent = ((data.verdictCounts.false/data.summary.totalClaims)*100).toFixed(1);
-    var partialPercent = ((data.verdictCounts.partial/data.summary.totalClaims)*100).toFixed(1);
-    var unverifiablePercent = ((data.verdictCounts.unverifiable/data.summary.totalClaims)*100).toFixed(1);
-    
-    return '<div class="dashboard">' +
-        '<h2>Results Summary</h2>' +
-        '<div class="document-meta">' +
-            '<h3>Document Details</h3>' +
-            '<div class="meta-grid">' +
-                '<div class="meta-item"><span class="meta-label">Title:</span><span>' + data.summary.documentTitle + '</span></div>' +
-                '<div class="meta-item"><span class="meta-label">Total Claims:</span><span>' + data.summary.totalClaims + ' analyzed</span></div>' +
-                '<div class="meta-item"><span class="meta-label">Generated:</span><span>' + data.summary.reportDate + '</span></div>' +
-                '<div class="meta-item"><span class="meta-label">Sources Used:</span><span>' + data.summary.sourcesUsed + ' verified</span></div>' +
+        function generateDashboardHTML(data) {
+            var truePercent = ((data.verdictCounts.true/data.summary.totalClaims)*100).toFixed(1);
+            var falsePercent = ((data.verdictCounts.false/data.summary.totalClaims)*100).toFixed(1);
+            var partialPercent = ((data.verdictCounts.partial/data.summary.totalClaims)*100).toFixed(1);
+            var unverifiablePercent = ((data.verdictCounts.unverifiable/data.summary.totalClaims)*100).toFixed(1);
+            
+            return '<div class="dashboard">' +
+                '<h2>Results Summary</h2>' +
+                '<div class="document-meta">' +
+                    '<h3>Document Details</h3>' +
+                    '<div class="meta-grid">' +
+                        '<div class="meta-item"><span class="meta-label">Title:</span><span>' + data.summary.documentTitle + '</span></div>' +
+                        '<div class="meta-item"><span class="meta-label">Total Claims:</span><span>' + data.summary.totalClaims + ' analyzed</span></div>' +
+                        '<div class="meta-item"><span class="meta-label">Generated:</span><span>' + data.summary.reportDate + '</span></div>' +
+                        '<div class="meta-item"><span class="meta-label">Sources Used:</span><span>' + data.summary.sourcesUsed + ' verified</span></div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="verdict-cards">' +
+                    '<div class="verdict-card true" onclick="showClaims(\'true\')">' +
+                        '<div class="verdict-number">' + data.verdictCounts.true + '</div>' +
+                        '<div class="verdict-label">True (' + truePercent + '%)</div>' +
+                    '</div>' +
+                    '<div class="verdict-card false" onclick="showClaims(\'false\')">' +
+                        '<div class="verdict-number">' + data.verdictCounts.false + '</div>' +
+                        '<div class="verdict-label">False (' + falsePercent + '%)</div>' +
+                    '</div>' +
+                    '<div class="verdict-card partially-true" onclick="showClaims(\'partial\')">' +
+                        '<div class="verdict-number">' + data.verdictCounts.partial + '</div>' +
+                        '<div class="verdict-label">Part True (' + partialPercent + '%)</div>' +
+                    '</div>' +
+                    '<div class="verdict-card unverifiable" onclick="showClaims(\'unverifiable\')">' +
+                        '<div class="verdict-number">' + data.verdictCounts.unverifiable + '</div>' +
+                        '<div class="verdict-label">Unverified (' + unverifiablePercent + '%)</div>' +
+                    '</div>' +
+                '</div>' +
+                '<div class="quick-actions">' +
+                    '<button class="action-btn" onclick="downloadPDF()">📄 Download PDF Report</button>' +
+                    '<button class="action-btn secondary" onclick="showAllSources()">🔗 View All Sources</button>' +
+                    '<button class="action-btn secondary" onclick="showClaims(\'all\')">📋 View All Claims</button>' +
+                '</div>' +
             '</div>' +
-        '</div>' +
-        '<div class="verdict-cards">' +
-            '<div class="verdict-card true" onclick="showClaims(\'true\')">' +
-                '<div class="verdict-number">' + data.verdictCounts.true + '</div>' +
-                '<div class="verdict-label">True (' + truePercent + '%)</div>' +
-            '</div>' +
-            '<div class="verdict-card false" onclick="showClaims(\'false\')">' +
-                '<div class="verdict-number">' + data.verdictCounts.false + '</div>' +
-                '<div class="verdict-label">False (' + falsePercent + '%)</div>' +
-            '</div>' +
-            '<div class="verdict-card partially-true" onclick="showClaims(\'partial\')">' +
-                '<div class="verdict-number">' + data.verdictCounts.partial + '</div>' +
-                '<div class="verdict-label">Part True (' + partialPercent + '%)</div>' +
-            '</div>' +
-            '<div class="verdict-card unverifiable" onclick="showClaims(\'unverifiable\')">' +
-                '<div class="verdict-number">' + data.verdictCounts.unverifiable + '</div>' +
-                '<div class="verdict-label">Unverified (' + unverifiablePercent + '%)</div>' +
-            '</div>' +
-        '</div>' +
-        '<div class="quick-actions">' +
-            '<button class="action-btn" onclick="downloadPDF()">📄 Download PDF Report</button>' +
-            '<button class="action-btn secondary" onclick="showAllSources()">🔗 View All Sources</button>' +
-            '<button class="action-btn secondary" onclick="showClaims(\'all\')">📋 View All Claims</button>' +
-        '</div>' +
-    '</div>' +
-    '<div id="detailed-claims" class="detailed-claims" style="display: none;">' +
-        '<a href="#" class="back-btn" onclick="showDashboard()">← Back to Summary</a>' +
-        '<h2 id="claims-title">Claims</h2>' +
-        '<div id="claims-content"></div>' +
-    '</div>';
-}
+            '<div id="detailed-claims" class="detailed-claims" style="display: none;">' +
+                '<a href="#" class="back-btn" onclick="showDashboard()">← Back to Summary</a>' +
+                '<h2 id="claims-title">Claims</h2>' +
+                '<div id="claims-content"></div>' +
+            '</div>';
+        }
 
-function showClaims(type) {
-    var dashboard = document.querySelector('.dashboard');
-    var detailedClaims = document.getElementById('detailed-claims');
-    var claimsTitle = document.getElementById('claims-title');
-    var claimsContent = document.getElementById('claims-content');
-    
-    dashboard.style.display = 'none';
-    detailedClaims.style.display = 'block';
-    
-    var titles = {
-        'true': 'True Claims (' + currentReportData.verdictCounts.true + ')',
-        'false': 'False Claims (' + currentReportData.verdictCounts.false + ')',
-        'partial': 'Partially True Claims (' + currentReportData.verdictCounts.partial + ')',
-        'unverifiable': 'Unverifiable Claims (' + currentReportData.verdictCounts.unverifiable + ')',
-        'all': 'All Claims (' + currentReportData.summary.totalClaims + ')'
-    };
-    
-    claimsTitle.textContent = titles[type];
-    claimsContent.innerHTML = generateClaimsHTML(currentReportData.claims[type] || currentReportData.claims.all);
-}
+        function showClaims(type) {
+            var dashboard = document.querySelector('.dashboard');
+            var detailedClaims = document.getElementById('detailed-claims');
+            var claimsTitle = document.getElementById('claims-title');
+            var claimsContent = document.getElementById('claims-content');
+            
+            dashboard.style.display = 'none';
+            detailedClaims.style.display = 'block';
+            
+            var titles = {
+                'true': 'True Claims (' + currentReportData.verdictCounts.true + ')',
+                'false': 'False Claims (' + currentReportData.verdictCounts.false + ')',
+                'partial': 'Partially True Claims (' + currentReportData.verdictCounts.partial + ')',
+                'unverifiable': 'Unverifiable Claims (' + currentReportData.verdictCounts.unverifiable + ')',
+                'all': 'All Claims (' + currentReportData.summary.totalClaims + ')'
+            };
+            
+            claimsTitle.textContent = titles[type];
+            claimsContent.innerHTML = generateClaimsHTML(currentReportData.claims[type] || currentReportData.claims.all);
+        }
 
-function generateClaimsHTML(claims) {
-    var html = '';
-    for (var i = 0; i < claims.length; i++) {
-        var claim = claims[i];
-        var verdictClass = claim.final_verdict.toLowerCase().replace(' ', '-');
-        var verdictText = claim.final_verdict === 'Partially True' ? '⚠️ Part True' : claim.final_verdict;
-        var explanationHTML = claim.explanation ? '<div class="explanation"><strong>Analysis:</strong> ' + claim.explanation + '</div>' : '';
-        
-        html += '<div class="claim">' +
-            '<div class="claim-header">' +
-                '<span class="claim-number">Claim ' + (i + 1) + '</span>' +
-                '<span class="verdict verdict-' + verdictClass + '">' + verdictText + '</span>' +
-            '</div>' +
-            '<div class="claim-text"><strong>Claim:</strong> ' + claim.claim_text + '</div>' +
-            explanationHTML +
-        '</div>';
-    }
-    return html;
-}
+        function generateClaimsHTML(claims) {
+            var html = '';
+            for (var i = 0; i < claims.length; i++) {
+                var claim = claims[i];
+                var verdictClass = claim.final_verdict.toLowerCase().replace(' ', '-');
+                var verdictText = claim.final_verdict === 'Partially True' ? '⚠️ Part True' : claim.final_verdict;
+                var explanationHTML = claim.explanation ? '<div class="explanation"><strong>Analysis:</strong> ' + claim.explanation + '</div>' : '';
+                
+                html += '<div class="claim">' +
+                    '<div class="claim-header">' +
+                        '<span class="claim-number">Claim ' + (i + 1) + '</span>' +
+                        '<span class="verdict verdict-' + verdictClass + '">' + verdictText + '</span>' +
+                    '</div>' +
+                    '<div class="claim-text"><strong>Claim:</strong> ' + claim.claim_text + '</div>' +
+                    explanationHTML +
+                '</div>';
+            }
+            return html;
+        }
 
-function showDashboard() {
-    document.querySelector('.dashboard').style.display = 'block';
-    document.getElementById('detailed-claims').style.display = 'none';
-}
+        function showDashboard() {
+            document.querySelector('.dashboard').style.display = 'block';
+            document.getElementById('detailed-claims').style.display = 'none';
+        }
 
-function downloadPDF() {
-    if (!currentReportData || !currentReportData.fullReportHTML) {
-        alert('No report data available for PDF generation.');
-        return;
-    }
-    var printWindow = window.open('', '_blank');
-    printWindow.document.write(currentReportData.fullReportHTML + '<script>window.onload = function() { setTimeout(function() { window.print(); }, 500); };</script>');
-    printWindow.document.close();
-}
+        function downloadPDF() {
+            if (!currentReportData || !currentReportData.fullReportHTML) {
+                alert('No report data available for PDF generation.');
+                return;
+            }
+            var printWindow = window.open('', '_blank');
+            printWindow.document.write(currentReportData.fullReportHTML + '<script>window.onload = function() { setTimeout(function() { window.print(); }, 500); };</script>');
+            printWindow.document.close();
+        }
 
-function showAllSources() {
-    if (!currentReportData || !currentReportData.allSources) {
-        alert('No source data available.');
-        return;
-    }
-    var sourcesWindow = window.open('', '_blank');
-    var html = '<html><head><title>Source References</title></head><body style="font-family: Arial, sans-serif; padding: 20px;"><h2>Source References (' + currentReportData.allSources.length + ' sources)</h2><ul>';
-    for (var i = 0; i < currentReportData.allSources.length; i++) {
-        html += '<li><a href="' + currentReportData.allSources[i] + '" target="_blank">' + currentReportData.allSources[i] + '</a></li>';
-    }
-    html += '</ul></body></html>';
-    sourcesWindow.document.write(html);
-    sourcesWindow.document.close();
-}
+        function showAllSources() {
+            if (!currentReportData || !currentReportData.allSources) {
+                alert('No source data available.');
+                return;
+            }
+            var sourcesWindow = window.open('', '_blank');
+            var html = '<html><head><title>Source References</title></head><body style="font-family: Arial, sans-serif; padding: 20px;"><h2>Source References (' + currentReportData.allSources.length + ' sources)</h2><ul>';
+            for (var i = 0; i < currentReportData.allSources.length; i++) {
+                html += '<li><a href="' + currentReportData.allSources[i] + '" target="_blank">' + currentReportData.allSources[i] + '</a></li>';
+            }
+            html += '</ul></body></html>';
+            sourcesWindow.document.write(html);
+            sourcesWindow.document.close();
+        }
 
         // File upload handling
         function handleFileUpload(inputId, displayId) {
@@ -991,6 +992,7 @@ function showAllSources() {
                 });
             });
         }
+
         function removeFile(inputId, index) {
             const input = document.getElementById(inputId);
             const dt = new DataTransfer();
@@ -1003,8 +1005,10 @@ function showAllSources() {
             input.files = dt.files;
             input.dispatchEvent(new Event('change'));
         }
+
         // Initialize file upload handlers
         handleFileUpload('mainDoc', 'mainDocFiles');
+
         // Form submission with popup blocker fix
         document.getElementById('factCheckForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -1094,6 +1098,7 @@ function showAllSources() {
                 submitBtn.disabled = false;
             }
         });
+
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -1107,6 +1112,7 @@ function showAllSources() {
                 }
             });
         });
+    </script>
     </script>
 </body>
 </html>
