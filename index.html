@@ -1003,11 +1003,8 @@ function showAllSources() {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const htmlContent = await response.text();
-
-// Encode HTML and redirect to report page
-const encodedHtml = encodeURIComponent(htmlContent);
-displayResults(reportData);
+                const reportData = await response.json();
+                     displayResults(reportData);
                 
                 // Update the form UI
                 statusText.textContent = '📊 Report opened in a new tab.';
