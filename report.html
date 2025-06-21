@@ -1,13 +1,65 @@
-window.addEventListener('load', function() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const reportData = urlParams.get('data');
-    
-    if (reportData) {
-        document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('reportContent').innerHTML = decodeURIComponent(reportData);
-        document.getElementById('reportContent').style.display = 'block';
-    } else {
-        document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('errorState').style.display = 'block';
-    }
-});
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fact Check Report</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8fafc;
+            margin: 0;
+            padding: 0;
+        }
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+        .error-message {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+            padding: 2rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 2rem;
+        }
+        #reportContent {
+            /* No extra styling - let the report's own CSS handle it */
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingState" class="loading">
+        <h2>Loading Report...</h2>
+        <p>Processing your fact-check results...</p>
+    </div>
+
+    <div id="errorState" class="error-message" style="display: none;">
+        <h3>❌ Error Loading Report</h3>
+        <p>No report data found.</p>
+    </div>
+
+    <div id="reportContent" style="display: none;">
+        <!-- Report content will be inserted here -->
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reportData = urlParams.get('data');
+            
+            if (reportData && reportData.trim()) {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('reportContent').innerHTML = decodeURIComponent(reportData);
+                document.getElementById('reportContent').style.display = 'block';
+            } else {
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('errorState').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
