@@ -817,6 +817,11 @@
 const reportWindow = window.open('', '_blank', 'noopener,noreferrer');
 reportWindow.document.write(htmlContent);
 reportWindow.document.close();
+
+                // ✅ Update the form UI
+statusText.textContent = '✅ Report opened in a new tab.';
+submitBtn.innerHTML = '🔍 Start Fact Checking';
+submitBtn.disabled = false;
                 
             } catch (error) {
                 console.error('Error:', error);
