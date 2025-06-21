@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -981,13 +982,11 @@ function showAllSources() {
                     
                     const fileItem = document.createElement('div');
                     fileItem.className = 'file-item';
-                    fileItem.innerHTML = '
-                        <div class="file-info">
-                            <span class="file-name">${file.name}</span>
-                            <span class="file-size">(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-                        </div>
-                        <button type="button" class="remove-file" onclick="removeFile('${inputId}', ${index})">✕</button>
-                    ';
+                    fileItem.innerHTML = '<div class="file-info">' +
+                        '<span class="file-name">' + file.name + '</span>' +
+                        '<span class="file-size">(' + (file.size / 1024 / 1024).toFixed(2) + ' MB)</span>' +
+                        '</div>' +
+                        '<button type="button" class="remove-file" onclick="removeFile(\'' + inputId + '\', ' + index + ')">✕</button>';
                     display.appendChild(fileItem);
                 });
             });
@@ -1046,7 +1045,7 @@ function showAllSources() {
                 const elapsed = Math.floor((Date.now() - startTime) / 1000);
                 const minutes = Math.floor(elapsed / 60);
                 const seconds = elapsed % 60;
-                const timeString = '${minutes}:${seconds.toString().padStart(2, '0')}';
+                const timeString = minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
                 loadingTimer.textContent = timeString;
             }, 1000);
             
@@ -1061,8 +1060,7 @@ function showAllSources() {
                 clearInterval(timer);
                 
                 if (!response.ok) {
-                  
-                    throw new Error('HTTP error! status: ${response.status}');
+                    throw new Error('HTTP error! status: ' + response.status);
                 }
                 
                 const htmlContent = await response.text();
@@ -1086,13 +1084,11 @@ function showAllSources() {
                 statusGroup.style.display = 'none';
                 resultsGroup.style.display = 'block';
                 
-                resultsContent.innerHTML = '
-                    <div class="error-message">
-                        <h3>❌ Error Processing Document</h3>
-                        <p><strong>Error:</strong> ${error.message}</p>
-                        <p><strong>Error Type:</strong> ${error.name}</p>
-                    </div>
-                ';
+                resultsContent.innerHTML = '<div class="error-message">' +
+                    '<h3>❌ Error Processing Document</h3>' +
+                    '<p><strong>Error:</strong> ' + error.message + '</p>' +
+                    '<p><strong>Error Type:</strong> ' + error.name + '</p>' +
+                    '</div>';
                 
                 submitBtn.innerHTML = '🔍 Start Fact Checking';
                 submitBtn.disabled = false;
@@ -1114,4 +1110,3 @@ function showAllSources() {
     </script>
 </body>
 </html>
-
