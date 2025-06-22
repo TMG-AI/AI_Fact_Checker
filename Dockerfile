@@ -17,7 +17,11 @@ RUN npm install --global n8n
 ENV N8N_USER_FOLDER=/home/node/.n8n \
     N8N_PORT=5678 \
     N8N_PROTOCOL=http \
-    NODE_ENV=production
+    NODE_ENV=production \
+    EXECUTIONS_TIMEOUT=600 \
+    EXECUTIONS_TIMEOUT_MAX=600 \
+    EXECUTIONS_MODE=queue \
+    NODE_OPTIONS="--max-old-space-size=4096"
 
 # Expose n8n port
 EXPOSE 5678
