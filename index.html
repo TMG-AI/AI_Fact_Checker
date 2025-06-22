@@ -819,14 +819,19 @@ window.addEventListener('load', function() {
             input.dispatchEvent(new Event('change'));
         }
         
-// Dashboard functionality
-let currentReportData = null;
-
 function displayResults(reportData) {
     currentReportData = reportData;
-    document.getElementById('fact-check-results').innerHTML = generateDashboardHTML(reportData);
-    document.getElementById('fact-check-results').style.display = 'block';
-    document.getElementById('fact-check-results').scrollIntoView({ behavior: 'smooth' });
+
+    // Render and display dashboard
+    const dashboard = document.getElementById('fact-check-results');
+    dashboard.innerHTML = generateDashboardHTML(reportData);
+    dashboard.style.display = 'block';
+
+    // Smooth scroll to dashboard
+    dashboard.scrollIntoView({ behavior: 'smooth' });
+
+    // OPTIONAL: Log for debugging
+    console.log("Dashboard rendered with data:", reportData);
 }
 
 function generateDashboardHTML(data) {
