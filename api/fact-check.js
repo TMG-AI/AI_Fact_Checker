@@ -125,6 +125,8 @@ export default async function handler(req, res) {
       headers: {
         ...formData.getHeaders(),
       },
+      // Add generous timeout for the HTTP request itself
+      signal: AbortSignal.timeout(280000), // 4 minutes 40 seconds (under the 5min function limit)
     });
 
     console.log('📊 Webhook response:', renderResponse.status, renderResponse.statusText);
