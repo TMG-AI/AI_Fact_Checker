@@ -13,31 +13,53 @@ export const config = {
 };
 
 export default async function handler(req, res) {
-  // Add CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    console.log(`❌ Method not allowed: ${req.method}`);
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+  // Immediate logging to confirm function starts
+  console.log('🎯 FUNCTION STARTED - Method:', req.method);
+  console.log('🎯 Headers:', JSON.stringify(req.headers, null, 2));
+  
   try {
+    // Add CORS headers
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    console.log('✅ CORS headers set');
+
+    if (req.method === 'OPTIONS') {
+      console.log('✅ OPTIONS request handled');
+      return res.status(200).end();
+    }
+
+    if (req.method !== 'POST') {
+      console.log(`❌ Method not allowed: ${req.method}`);
+      return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    console.log('✅ Method validation passed');
+
     console.log('🚀 Starting file processing...');
     
+    // Test if we can access /tmp directory
+    try {
+      const fs = require('fs');
+      if (!fs.existsSync('/tmp')) {
+        console.log('❌ /tmp directory does not exist');
+      } else {
+        console.log('✅ /tmp directory exists');
+      }
+    } catch (tmpError) {
+      console.log('❌ Error checking /tmp:', tmpError.message);
+    }
+    
     // Configure formidable to use /tmp directory (required for Vercel)
+    console.log('📝 Configuring formidable...');
     const form = formidable({
       uploadDir: '/tmp',
       keepExtensions: true,
       maxFileSize: 10 * 1024 * 1024, // 10MB limit
     });
+    console.log('✅ Formidable configured');
 
-    console.log('📝 Parsing form data...');
+    console.log('📝 Starting form parsing...');
     
     // Parse the incoming form data
     const [fields, files] = await new Promise((resolve, reject) => {
@@ -142,13 +164,23 @@ export default async function handler(req, res) {
     return res.status(200).json(responseData);
 
   } catch (error) {
-    console.error('💥 Unexpected error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('💥 CAUGHT ERROR AT TOP LEVEL');
+    console.error('💥 Error name:', error.name);
+    console.error('💥 Error message:', error.message);
+    console.error('💥 Error stack:', error.stack);
+    console.error('💥 Full error object:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
     
-    return res.status(500).json({ 
-      error: 'Internal server error',
-      message: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-    });
+    // Try to send a response
+    try {
+      return res.status(500).json({ 
+        error: 'Internal server error',
+        message: error.message,
+        name: error.name,
+        stack: error.stack
+      });
+    } catch (responseError) {
+      console.error('💥 Could not even send error response:', responseError);
+      return res.status(500).end('Critical error');
+    }
   }
 }
