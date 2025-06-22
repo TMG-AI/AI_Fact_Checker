@@ -729,9 +729,34 @@
             <p style="font-size: 0.9rem; opacity: 0.6;">&copy; 2025 The Messina Group. All rights reserved.</p>
         </div>
     </footer>
-
+<script>
         // Update to use Render webhook URL
         const WEBHOOK_URL = 'https://ai-fact-checker-5ksf.onrender.com/webhook/fact-check-upload';
+
+// Clear any persistent dashboard data on page load
+window.addEventListener('load', function() {
+    // Clear localStorage and sessionStorage
+    localStorage.removeItem('currentReportData');
+    sessionStorage.removeItem('dashboardResults');
+    
+    // Reset global variables
+    currentReportData = null;
+    
+    // Clear dashboard display
+    const resultsElement = document.getElementById('fact-check-results');
+    if (resultsElement) {
+        resultsElement.style.display = 'none';
+        resultsElement.innerHTML = '';
+    }
+    
+    // Reset form to initial state
+    const form = document.getElementById('factCheckForm');
+    if (form) {
+        form.reset();
+    }
+});
+
+       
         // File upload handling
         function handleFileUpload(inputId, displayId) {
             const input = document.getElementById(inputId);
