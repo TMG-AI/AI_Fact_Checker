@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html lang="en">
@@ -895,9 +894,14 @@ function showAllSources() {
             // Show loading state 
             submitBtn.innerHTML = '⏳ Processing...';
             submitBtn.disabled = true;
-            statusGroup.style.display = 'block';
-            statusText.textContent = 'Processing your document...';
-            resultsGroup.style.display = 'none';
+            // Reset UI state
+document.getElementById('fact-check-results').style.display = 'none';
+document.getElementById('fact-check-results').innerHTML = ''; // ← clears old dashboard
+
+statusGroup.style.display = 'block';
+statusText.textContent = 'Processing your document...';
+resultsGroup.style.display = 'none';
+
             
             // Start timer
             const startTime = Date.now();
