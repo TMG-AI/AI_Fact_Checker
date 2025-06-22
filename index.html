@@ -865,61 +865,87 @@ function showAllSources() {
 // Initialize file upload handlers
         handleFileUpload('mainDoc', 'mainDocFiles');
         // Form submission with popup blocker fix
-        document.getElementById('factCheckForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const submitBtn = document.getElementById('submitBtn');
-            const statusGroup = document.getElementById('statusGroup');
-            const statusText = document.getElementById('statusText');
-            const loadingTimer = document.getElementById('loadingTimer');
-            const resultsGroup = document.getElementById('resultsGroup');
-            const resultsContent = document.getElementById('resultsContent');
-            
-            // Get form data
-            const formData = new FormData();
-            const fileInput = document.getElementById('mainDoc');
-            const sourceUrls = document.getElementById('sourceUrls').value;
-            
-            if (!fileInput.files[0]) {
-                alert('Please select a PDF file to upload.');
-                return;
-            }
-            
-            // Append file and source URLs
-            formData.append('file', fileInput.files[0]);
-            if (sourceUrls.trim()) {
-                formData.append('sourceUrls', sourceUrls.trim());
-            }
-            
-            // Show loading state 
-            submitBtn.innerHTML = '⏳ Processing...';
-            submitBtn.disabled = true;
-            // Reset UI state
-document.getElementById('fact-check-results').style.display = 'none';
-document.getElementById('fact-check-results').innerHTML = ''; // ← clears old dashboard
+       document.getElementById('factCheckForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-statusGroup.style.display = 'block';
-statusText.textContent = 'Processing your document...';
-resultsGroup.style.display = 'none';
+    const submitBtn = document.getElementById('submitBtn');
+    const statusGroup = document.getElementById('statusGroup');
+    const statusText = document.getElementById('statusText');
+    const loadingTimer = document.getElementById('loadingTimer');
+    const resultsGroup = document.getElementById('resultsGroup');
+    const resultsContent = document.getElementById('resultsContent');
+    const resultsDashboard = document.getElementById('fact-check-results');
 
-            
-            // Start timer
-            const startTime = Date.now();
-            const timer = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - startTime) / 1000);
-                const minutes = Math.floor(elapsed / 60);
-                const seconds = elapsed % 60;
-                const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-                loadingTimer.textContent = timeString;
-            }, 1000);
-            
-            try {
-                console.log('Sending request to:', WEBHOOK_URL);
-                
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    body: formData
-                });
+    // Reset UI state
+    resultsDashboard.style.display = 'none';
+    resultsDashboard.innerHTML = ''; // ← clears old dashboard
+
+    statusGroup.style.display = 'block';
+    statusText.textContent = 'Processing your document...';
+    resultsGroup.style.display = 'none';
+
+    // Get form data
+    const formData = new FormData();
+    const fileInput = document.getElementById('mainDoc');
+    const sourceUrls = document.getElementById('sourceUrls').value;
+
+    if (!fileInput.files[0]) {
+        alert('Please select a PDF file to upload.');
+        return;
+    }
+
+    formData.append('file', fileInput.files[0]);
+    if (sourceUrls.trim()) {
+        formData.append('sourceUrls', sourceUrls.trim());
+    }
+
+    // Start timer
+    const startTime = Date.now();
+    const timer = setInterval(() => {
+        const elapsed = Math.floor((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(elapsed / 60);
+        const seconds = elapsed % 60;
+        const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        loadingTimer.textContent = timeString;
+    }, 1000);
+
+    try {
+        const response = await fetch(WEBHOOK_URL, {
+            method: 'POST',
+            body: formData
+        });
+
+        clearInterval(timer);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const reportData = await response.json();
+        displayResults(reportData);
+
+        statusText.textContent = '📊 Report opened in a new tab.';
+        submitBtn.innerHTML = '🔍 Start Fact Checking';
+        submitBtn.disabled = false;
+
+    } catch (error) {
+        clearInterval(timer);
+        statusGroup.style.display = 'none';
+        resultsGroup.style.display = 'block';
+
+        resultsContent.innerHTML = `
+            <div class="error-message">
+                <h3>❌ Error Processing Document</h3>
+                <p><strong>Error:</strong> ${error.message}</p>
+                <p><strong>Error Type:</strong> ${error.name}</p>
+            </div>
+        `;
+
+        submitBtn.innerHTML = '🔍 Start Fact Checking';
+        submitBtn.disabled = false;
+    }
+});
+
                 
                 clearInterval(timer);
                 
