@@ -969,45 +969,7 @@ function showAllSources() {
         submitBtn.innerHTML = '🔍 Start Fact Checking';
         submitBtn.disabled = false;
     }
-});
-
-                
-                clearInterval(timer);
-                
-                if (!response.ok) {
-                  
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const reportData = await response.json();
-                     displayResults(reportData);
-                
-                // Update the form UI
-                statusText.textContent = '📊 Report opened in a new tab.';
-                submitBtn.innerHTML = '🔍 Start Fact Checking';
-                submitBtn.disabled = false;
-                
-            } catch (error) {
-                console.error('Error:', error);
-                
-                clearInterval(timer);
-                
-                // Show error
-                statusGroup.style.display = 'none';
-                resultsGroup.style.display = 'block';
-                
-                resultsContent.innerHTML = `
-                    <div class="error-message">
-                        <h3>❌ Error Processing Document</h3>
-                        <p><strong>Error:</strong> ${error.message}</p>
-                        <p><strong>Error Type:</strong> ${error.name}</p>
-                    </div>
-                `;
-                
-                submitBtn.innerHTML = '?? Start Fact Checking';
-                submitBtn.disabled = false;
-            }
-        });
+});           
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
