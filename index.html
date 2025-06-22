@@ -293,80 +293,7 @@
             color: #4a5568;
             line-height: 1.6;
         }
-        /* How It Works */
-        .how-it-works {
-            padding: 40px 0;
-            background: linear-gradient(135deg, #f8fafc 0%, #e6f3ff 100%);
-        }
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .step {
-            text-align: center;
-            position: relative;
-        }
-        .step-number {
-            width: 50px;
-            height: 50px;
-            background: linear-gradient(135deg, #2d5a87, #4a90a4);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin: 0 auto 0.75rem;
-        }
-        .step h3 {
-            color: #1a365d;
-            margin-bottom: 0.25rem;
-        }
-        .step p {
-            color: #4a5568;
-        }
-        /* Footer */
-        .footer {
-            background: #1a365d;
-            color: white;
-            padding: 1rem 0;
-            text-align: center;
-        }
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-        .footer-logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-        .footer p {
-            opacity: 0.8;
-            margin-bottom: 2rem;
-        }
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-        .footer-links a {
-            color: white;
-            text-decoration: none;
-            opacity: 0.8;
-            transition: opacity 0.3s;
-        }
-        .footer-links a:hover {
-            opacity: 1;
-        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .hero h1 {
@@ -702,7 +629,6 @@
 <nav>
 <ul class="nav-links">
 <li><a href="#features">Why Use AI Fact Checker?</a></li>
-<li><a href="#how-it-works">How It Works?</a></li>
 </ul>
 </nav>
 </div>
@@ -724,7 +650,7 @@
 <form class="upload-form" enctype="multipart/form-data" id="factCheckForm">
 <div class="form-group" id="mainDocGroup">
 <label>Document to Fact Check</label>
-<p class="description">Upload the primary document you want to fact check (PDF format supported)</p>
+<p class="description">Upload the document you want to fact check (PDF format supported)</p>
 <div class="file-upload-area">
 <div class="upload-icon">📄</div>
 <div class="upload-text">Click to browse or drag file here</div>
@@ -748,7 +674,7 @@
 </div>
 <p id="statusText">Processing your document...</p>
 <p id="loadingTimer" style="font-weight: bold; color: #2d5a87;">0:00</p>
-<p style="font-size: 0.9rem; color: #64748b;">This may take 1-2 minutes depending on document length</p>
+<p style="font-size: 0.9rem; color: #64748b;">This may a few minutes depending on document length</p>
 </div>
 </div>
 <!-- Results Section -->
@@ -791,38 +717,7 @@
 <div class="feature-card">
 <div class="feature-icon">📄</div>
 <h3>Detailed Reporting</h3>
-<p>Professional reports with source quality assessment, gap analysis, and confidence scoring for each claim.</p>
-</div>
-</div>
-</div>
-</section>
-<!-- How It Works -->
-<section class="how-it-works" id="how-it-works">
-<div class="container">
-<div class="section-header">
-<h2>How It Works</h2>
-<p>Our AI-powered process ensures comprehensive fact-checking and source verification</p>
-</div>
-<div class="steps">
-<div class="step">
-<div class="step-number">1</div>
-<h3>📤 Upload &amp; Parse</h3>
-<p>Upload your document and sources. Our AI extracts and analyzes every factual claim.</p>
-</div>
-<div class="step">
-<div class="step-number">2</div>
-<h3>🔗 Source Verification</h3>
-<p>We verify claims against your provided sources first, checking citation accuracy and context.</p>
-</div>
-<div class="step">
-<div class="step-number">3</div>
-<h3>🌐 Comprehensive Research</h3>
-<p>Additional verification using authoritative sources and cross-referencing with multiple AI systems.</p>
-</div>
-<div class="step">
-<div class="step-number">4</div>
-<h3>📋 Detailed Report</h3>
-<p>Receive a comprehensive report with source analysis.</p>
+<p>Receive a comprehensive report with sources.</p>
 </div>
 </div>
 </div>
