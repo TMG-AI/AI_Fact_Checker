@@ -816,6 +816,7 @@ function displayResults(reportData) {
     currentReportData = reportData;
 
     // Render and display dashboard
+       console.log("reportData passed to generateDashboardHTML:", reportData);
     const dashboard = document.getElementById('fact-check-results');
     dashboard.innerHTML = generateDashboardHTML(reportData);
     dashboard.style.display = 'block';
