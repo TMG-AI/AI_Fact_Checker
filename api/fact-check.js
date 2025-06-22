@@ -1,19 +1,20 @@
-// /api/fact-check.js - The working version before we added too much debugging
+// /api/fact-check.js - Alternative approach using buffers instead of formidable
 
-import formidable from 'formidable';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
-import fs from 'fs';
 
-// Disable body parsing so we can handle multipart/form-data ourselves
+// Enable body parsing as raw
 export const config = {
   api: {
-    bodyParser: false,
+    bodyParser: {
+      sizeLimit: '10mb',
+    },
   },
 };
 
 export default async function handler(req, res) {
   console.log('🚀 API called - Method:', req.method);
+  console.log('🚀 Content-Type:', req.headers['content-type']);
   
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -31,70 +32,95 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Configure formidable to use /tmp directory (required for Vercel)
-    console.log('📝 Configuring formidable...');
-    const form = formidable({
-      uploadDir: '/tmp',
-      keepExtensions: true,
-      maxFileSize: 10 * 1024 * 1024, // 10MB limit
-    });
-
-    console.log('📋 Parsing form...');
-    // Parse the incoming form data
-    const [fields, files] = await new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) {
-          console.error('❌ Form parse error:', err);
-          reject(err);
-        } else {
-          console.log('✅ Form parsed - Fields:', Object.keys(fields), 'Files:', Object.keys(files));
-          resolve([fields, files]);
-        }
-      });
-    });
-
-    // Get the uploaded file
-    const uploadedFile = files.file || files.pdf || Object.values(files)[0];
+    console.log('📋 Processing multipart data...');
     
-    if (!uploadedFile) {
-      console.log('❌ No file found - Available files:', Object.keys(files));
+    // Parse multipart data manually
+    const contentType = req.headers['content-type'];
+    if (!contentType || !contentType.includes('multipart/form-data')) {
+      return res.status(400).json({ error: 'Must be multipart/form-data' });
+    }
+
+    // Get boundary from content-type
+    const boundary = contentType.split('boundary=')[1];
+    if (!boundary) {
+      return res.status(400).json({ error: 'No boundary found in content-type' });
+    }
+
+    console.log('📋 Boundary found:', boundary);
+
+    // Read the raw body
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
+    }
+    const body = Buffer.concat(chunks);
+    
+    console.log('📋 Body size:', body.length);
+
+    // Parse multipart data
+    const boundaryBuffer = Buffer.from(`--${boundary}`);
+    const parts = [];
+    let start = 0;
+    
+    while (true) {
+      const boundaryIndex = body.indexOf(boundaryBuffer, start);
+      if (boundaryIndex === -1) break;
+      
+      if (start > 0) {
+        parts.push(body.slice(start, boundaryIndex));
+      }
+      start = boundaryIndex + boundaryBuffer.length;
+    }
+
+    console.log('📋 Found parts:', parts.length);
+
+    // Find the file part
+    let fileBuffer = null;
+    let filename = 'document.pdf';
+    
+    for (const part of parts) {
+      const partStr = part.toString('utf8', 0, Math.min(500, part.length));
+      
+      if (partStr.includes('Content-Disposition') && partStr.includes('filename')) {
+        console.log('📄 Found file part');
+        
+        // Extract filename
+        const filenameMatch = partStr.match(/filename="([^"]+)"/);
+        if (filenameMatch) {
+          filename = filenameMatch[1];
+        }
+        
+        // Find where headers end (double CRLF)
+        const headerEndIndex = part.indexOf('\r\n\r\n');
+        if (headerEndIndex !== -1) {
+          // Extract file data (excluding trailing CRLF)
+          fileBuffer = part.slice(headerEndIndex + 4, part.length - 2);
+          console.log('📄 File extracted:', {
+            filename,
+            size: fileBuffer.length
+          });
+          break;
+        }
+      }
+    }
+
+    if (!fileBuffer) {
+      console.log('❌ No file found in request');
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    console.log('📄 File found:', {
-      name: uploadedFile.originalFilename,
-      size: uploadedFile.size,
-      type: uploadedFile.mimetype,
-      path: uploadedFile.filepath,
-      newFilename: uploadedFile.newFilename
-    });
-
-    // Check if file exists and get correct path
-    let filePath = uploadedFile.filepath || uploadedFile.path;
-    if (!filePath && uploadedFile.newFilename) {
-      filePath = `/tmp/${uploadedFile.newFilename}`;
-    }
-    
-    console.log('📁 Using file path:', filePath);
-    
-    if (!filePath || !fs.existsSync(filePath)) {
-      console.error('❌ File not found at path:', filePath);
-      console.log('Available file properties:', Object.keys(uploadedFile));
-      return res.status(500).json({ error: 'File processing failed - file not accessible' });
-    }
-
-    // Create form data to send to Render
     console.log('📦 Creating FormData for webhook...');
-    const formData = new FormData();
-    const fileStream = fs.createReadStream(filePath);
     
-    formData.append('file', fileStream, {
-      filename: uploadedFile.originalFilename || 'document.pdf',
-      contentType: uploadedFile.mimetype || 'application/pdf'
+    // Create form data to send to webhook
+    const formData = new FormData();
+    formData.append('file', fileBuffer, {
+      filename: filename,
+      contentType: 'application/pdf'
     });
 
     console.log('🌐 Sending to webhook...');
-    // Send to your Render webhook (corrected URL)
+    
+    // Send to your Render webhook
     const renderResponse = await fetch('https://ai-fact-checker-5ksf.onrender.com/webhook/fact-check-upload', {
       method: 'POST',
       body: formData,
@@ -133,13 +159,7 @@ export default async function handler(req, res) {
       });
     }
 
-    // Clean up the temporary file
-    try {
-      fs.unlinkSync(uploadedFile.filepath);
-    } catch (cleanupError) {
-      // Ignore cleanup errors
-    }
-
+    console.log('✅ Success! Returning data to frontend');
     return res.status(200).json(responseData);
 
   } catch (error) {
