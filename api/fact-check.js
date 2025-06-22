@@ -65,13 +65,28 @@ export default async function handler(req, res) {
       name: uploadedFile.originalFilename,
       size: uploadedFile.size,
       type: uploadedFile.mimetype,
-      path: uploadedFile.filepath
+      path: uploadedFile.filepath,
+      newFilename: uploadedFile.newFilename
     });
+
+    // Check if file exists and get correct path
+    let filePath = uploadedFile.filepath || uploadedFile.path;
+    if (!filePath && uploadedFile.newFilename) {
+      filePath = `/tmp/${uploadedFile.newFilename}`;
+    }
+    
+    console.log('📁 Using file path:', filePath);
+    
+    if (!filePath || !fs.existsSync(filePath)) {
+      console.error('❌ File not found at path:', filePath);
+      console.log('Available file properties:', Object.keys(uploadedFile));
+      return res.status(500).json({ error: 'File processing failed - file not accessible' });
+    }
 
     // Create form data to send to Render
     console.log('📦 Creating FormData for webhook...');
     const formData = new FormData();
-    const fileStream = fs.createReadStream(uploadedFile.filepath);
+    const fileStream = fs.createReadStream(filePath);
     
     formData.append('file', fileStream, {
       filename: uploadedFile.originalFilename || 'document.pdf',
