@@ -4,10 +4,11 @@ import Busboy from 'busboy';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
 
-// Disable body parsing so we can handle multipart/form-data ourselves
+// Increase function timeout (requires Vercel Pro plan)
 export const config = {
   api: {
     bodyParser: false,
+    maxDuration: 300, // 5 minutes (Pro plan)
   },
 };
 
@@ -102,9 +103,22 @@ export default async function handler(req, res) {
       contentType: 'application/pdf'
     });
 
-    console.log('🌐 Sending to webhook...');
+    console.log('🌐 Triggering webhook (async)...');
     
-    // Send to your Render webhook
+    // Fire-and-forget: trigger webhook but don't wait for the full response
+    fetch('https://ai-fact-checker-5ksf.onrender.com/webhook/fact-check-upload', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        ...formData.getHeaders(),
+      },
+    }).catch(err => {
+      console.error('⚠️ Webhook error (continuing anyway):', err.message);
+    });
+
+    console.log('🌐 Sending to webhook and waiting for response...');
+    
+    // Send to your Render webhook and WAIT for the complete response
     const renderResponse = await fetch('https://ai-fact-checker-5ksf.onrender.com/webhook/fact-check-upload', {
       method: 'POST',
       body: formData,
@@ -119,13 +133,13 @@ export default async function handler(req, res) {
       const errorText = await renderResponse.text();
       console.error('❌ Webhook failed:', renderResponse.status, errorText);
       return res.status(500).json({ 
-        error: 'Webhook failed', 
+        error: 'Analysis failed', 
         details: errorText,
         status: renderResponse.status 
       });
     }
 
-    // Get the response data
+    // Get the complete response data
     const responseText = await renderResponse.text();
     console.log('📥 Webhook response text length:', responseText.length);
     
@@ -138,12 +152,12 @@ export default async function handler(req, res) {
       console.error('❌ JSON parse failed:', parseError.message);
       console.log('Raw response preview:', responseText.substring(0, 500));
       return res.status(500).json({ 
-        error: 'Invalid JSON response from webhook',
+        error: 'Invalid response format',
         rawResponse: responseText.substring(0, 1000)
       });
     }
 
-    console.log('✅ Success! Returning data to frontend');
+    console.log('✅ Success! Returning analysis results to frontend');
     return res.status(200).json(responseData);
 
   } catch (error) {
