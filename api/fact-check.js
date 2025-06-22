@@ -1,20 +1,18 @@
-// /api/fact-check.js - Alternative approach using buffers instead of formidable
+// /api/fact-check.js - Using busboy which works better with Vercel
 
+import Busboy from 'busboy';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
 
-// Enable body parsing as raw
+// Disable body parsing so we can handle multipart/form-data ourselves
 export const config = {
   api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
+    bodyParser: false,
   },
 };
 
 export default async function handler(req, res) {
   console.log('🚀 API called - Method:', req.method);
-  console.log('🚀 Content-Type:', req.headers['content-type']);
   
   // Add CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -32,80 +30,66 @@ export default async function handler(req, res) {
   }
 
   try {
-    console.log('📋 Processing multipart data...');
+    console.log('📋 Setting up busboy...');
     
-    // Parse multipart data manually
-    const contentType = req.headers['content-type'];
-    if (!contentType || !contentType.includes('multipart/form-data')) {
-      return res.status(400).json({ error: 'Must be multipart/form-data' });
-    }
-
-    // Get boundary from content-type
-    const boundary = contentType.split('boundary=')[1];
-    if (!boundary) {
-      return res.status(400).json({ error: 'No boundary found in content-type' });
-    }
-
-    console.log('📋 Boundary found:', boundary);
-
-    // Read the raw body
-    const chunks = [];
-    for await (const chunk of req) {
-      chunks.push(chunk);
-    }
-    const body = Buffer.concat(chunks);
-    
-    console.log('📋 Body size:', body.length);
-
-    // Parse multipart data
-    const boundaryBuffer = Buffer.from(`--${boundary}`);
-    const parts = [];
-    let start = 0;
-    
-    while (true) {
-      const boundaryIndex = body.indexOf(boundaryBuffer, start);
-      if (boundaryIndex === -1) break;
-      
-      if (start > 0) {
-        parts.push(body.slice(start, boundaryIndex));
+    const busboy = Busboy({ 
+      headers: req.headers,
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB limit
       }
-      start = boundaryIndex + boundaryBuffer.length;
-    }
-
-    console.log('📋 Found parts:', parts.length);
-
-    // Find the file part
+    });
+    
     let fileBuffer = null;
     let filename = 'document.pdf';
-    
-    for (const part of parts) {
-      const partStr = part.toString('utf8', 0, Math.min(500, part.length));
+    let fileSize = 0;
+
+    // Handle file upload
+    busboy.on('file', (fieldname, file, info) => {
+      console.log('📄 File detected:', info);
+      filename = info.filename || 'document.pdf';
       
-      if (partStr.includes('Content-Disposition') && partStr.includes('filename')) {
-        console.log('📄 Found file part');
-        
-        // Extract filename
-        const filenameMatch = partStr.match(/filename="([^"]+)"/);
-        if (filenameMatch) {
-          filename = filenameMatch[1];
-        }
-        
-        // Find where headers end (double CRLF)
-        const headerEndIndex = part.indexOf('\r\n\r\n');
-        if (headerEndIndex !== -1) {
-          // Extract file data (excluding trailing CRLF)
-          fileBuffer = part.slice(headerEndIndex + 4, part.length - 2);
-          console.log('📄 File extracted:', {
-            filename,
-            size: fileBuffer.length
-          });
-          break;
-        }
-      }
-    }
+      const chunks = [];
+      
+      file.on('data', (chunk) => {
+        chunks.push(chunk);
+        fileSize += chunk.length;
+      });
+      
+      file.on('end', () => {
+        fileBuffer = Buffer.concat(chunks);
+        console.log('✅ File collected:', {
+          filename,
+          size: fileBuffer.length
+        });
+      });
+    });
+
+    // Handle completion
+    const uploadPromise = new Promise((resolve, reject) => {
+      busboy.on('finish', () => {
+        console.log('✅ Busboy finished');
+        resolve();
+      });
+      
+      busboy.on('error', (err) => {
+        console.error('❌ Busboy error:', err);
+        reject(err);
+      });
+      
+      // Timeout after 30 seconds
+      setTimeout(() => {
+        reject(new Error('Upload timeout'));
+      }, 30000);
+    });
+
+    // Pipe the request to busboy
+    req.pipe(busboy);
+    
+    // Wait for upload to complete
+    await uploadPromise;
 
     if (!fileBuffer) {
-      console.log('❌ No file found in request');
+      console.log('❌ No file received');
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
