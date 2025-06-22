@@ -1,0 +1,9 @@
+{
+  "name": "ai-fact-checker-proxy",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "form-data": "^4.0.0",
+    "formidable": "^3.8.0"
+  }
+}
