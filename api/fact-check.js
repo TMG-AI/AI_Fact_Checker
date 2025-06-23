@@ -119,7 +119,7 @@ export default async function handler(req, res) {
     console.log('🌐 Sending to webhook and waiting for response...');
     
     // Send to your Render webhook and WAIT for the complete response
-    const renderResponse = await fetch('https://ai-fact-checker-5ksf.onrender.com/webhook/fact-check-upload', {
+    const renderResponse = await fetch('fetch('https://eb8a-2601-43-4101-9a90-bd0a-e66b-e3c5-ff5e.ngrok-free.app/webhook/webhook-test', {', {
       method: 'POST',
       body: formData,
       headers: {
