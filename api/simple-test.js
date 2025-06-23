@@ -1,4 +1,4 @@
-export default function handler(req, res) {
+module.exports = (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   
   if (req.method === 'OPTIONS') {
@@ -9,4 +9,4 @@ export default function handler(req, res) {
     message: "Simple test works!",
     method: req.method 
   });
-}
+};
