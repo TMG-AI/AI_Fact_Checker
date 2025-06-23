@@ -1,4 +1,7 @@
 {
+  "type": "module"
+}
+{
   "name": "fact-checker-frontend",
   "version": "1.0.0",
   "description": "Frontend for fact-checking application",
