@@ -106,7 +106,7 @@ export default async function handler(req, res) {
     console.log('🌐 Triggering webhook (async)...');
     
     // Fire-and-forget: trigger webhook but don't wait for the full response
-    fetch('https://eb8a-2601-43-4101-9a90-bd0a-e66b-e3c5-ff5e.ngrok-free.app', {
+    fetch('https://eb8a-2601-43-4101-9a90-bd0a-e66b-e3c5-ff5e.ngrok-free.app/webhook/webhook-test', {
       method: 'POST',
       body: formData,
       headers: {
