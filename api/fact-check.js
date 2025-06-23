@@ -1,3 +1,7 @@
+// Updated with ES modules
+import Busboy from 'busboy';
+// ... rest of your code
+
 // /api/fact-check.js - Using busboy which works better with Vercel
 
 import Busboy from 'busboy';
