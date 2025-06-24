@@ -945,7 +945,9 @@ function showAllSources() {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const reportData = await response.json();
+        const responseText = await response.text();
+console.log('Raw response:', responseText.substring(0, 500));
+const reportData = JSON.parse(responseText);
         displayResults(reportData);
 
         statusText.textContent = '📊 Report opened in a new tab.';
