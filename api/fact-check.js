@@ -7,7 +7,7 @@ import fetch from 'node-fetch';
 export const config = {
   api: {
     bodyParser: false,
-    maxDuration: 300, // 5 minutes with Pro + Fluid Compute
+    maxDuration: 800, // 13+ minutes with Pro + Fluid Compute
   },
 };
 
