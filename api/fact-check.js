@@ -144,10 +144,20 @@ export default async function handler(req, res) {
   console.log('✅ Success! Returning analysis results to frontend');
 
 // Force correct headers and ensure response is sent
+console.log('✅ Success! Returning analysis results to frontend');
+console.log('🔍 Response data type:', typeof responseData);
+console.log('🔍 Response data is array:', Array.isArray(responseData));
+console.log('🔍 Response data length:', responseData?.length);
+
+if (!responseData || !Array.isArray(responseData) || responseData.length === 0) {
+  return res.status(500).json({ error: 'Invalid response data from webhook' });
+}
+
+const jsonResponse = JSON.stringify(responseData[0]);
 res.setHeader('Content-Type', 'application/json');
-res.setHeader('Content-Length', JSON.stringify(responseData[0]).length);
+res.setHeader('Content-Length', jsonResponse.length);
 res.status(200);
-res.end(JSON.stringify(responseData[0]));
+res.end(jsonResponse);
 return;
 
   } catch (error) {
