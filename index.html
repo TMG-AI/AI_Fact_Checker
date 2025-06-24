@@ -835,17 +835,6 @@ function generateDashboardHTML(data) {
     return `
         <div class="dashboard">
     <h2>Fact Check Summary</h2>
-    <!-- Summary Stats -->
-        <div class="summary-stats">
-            <div class="stat-item">
-                <span class="stat-label"><strong>Total Claims:</strong></span>
-                <span class="stat-value"><strong>${data.summary.totalClaims}</strong></span>
-            </div>
-            <div class="stat-item">
-                <span class="stat-label"><strong>Sources Used:</strong></span>
-                <span class="stat-value"><strong>${data.summary.sourcesUsed}</strong></span>
-            </div>
-        </div>
     <div class="verdict-cards">
         <div class="verdict-card true"><div class="verdict-number">${data.verdictCounts.true}</div><div class="verdict-label">True</div></div>
         <div class="verdict-card partially-true"><div class="verdict-number">${data.verdictCounts.partial}</div><div class="verdict-label">Partially True</div></div>
