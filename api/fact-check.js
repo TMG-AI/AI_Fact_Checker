@@ -144,16 +144,24 @@ export default async function handler(req, res) {
 
     console.log('✅ Success! Returning analysis results to frontend');
     
-    // Check if we have valid data
-    if (!responseData || !Array.isArray(responseData) || responseData.length === 0) {
+    // Handle both array and object responses from n8n
+    let factCheckData;
+    if (Array.isArray(responseData)) {
+      if (responseData.length === 0) {
+        return res.status(500).json({ error: 'Empty array received from webhook' });
+      }
+      factCheckData = responseData[0];
+    } else if (responseData && typeof responseData === 'object') {
+      factCheckData = responseData;
+    } else {
       console.log('❌ Invalid response data structure:', responseData);
       return res.status(500).json({ error: 'No valid data received from webhook' });
     }
     
-    console.log('📊 Returning data for document:', responseData[0]?.summary?.documentTitle);
+    console.log('📊 Returning data for document:', factCheckData?.summary?.documentTitle);
     
     // Compress the response to handle large payloads
-    const jsonString = JSON.stringify(responseData[0]);
+    const jsonString = JSON.stringify(factCheckData);
     console.log('📏 Response size before compression:', jsonString.length, 'bytes');
     
     const compressedData = zlib.gzipSync(jsonString);
