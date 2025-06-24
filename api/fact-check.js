@@ -143,6 +143,13 @@ export default async function handler(req, res) {
     }
 
     console.log('✅ Success! Returning analysis results to frontend');
+    
+    // Check if we have valid data
+    if (!responseData || !Array.isArray(responseData) || responseData.length === 0) {
+      console.log('❌ Invalid response data structure:', responseData);
+      return res.status(500).json({ error: 'No valid data received from webhook' });
+    }
+    
     console.log('📊 Returning data for document:', responseData[0]?.summary?.documentTitle);
     
     // Compress the response to handle large payloads
