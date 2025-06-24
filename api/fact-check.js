@@ -106,7 +106,7 @@ export default async function handler(req, res) {
     // Wait for full n8n response
     console.log('🌐 Sending to webhook and waiting for response...');
 
-    const renderResponse = await fetch('https://eb8a-2601-43-4101-9a90-bd0a-e66b-e3c5-ff5e.ngrok-free.app/webhook/webhook-test', {
+    const renderResponse = await fetch('https://6b06-2601-43-4101-9a90-981a-3b10-5c53-a9dd.ngrok-free.app/webhook/webhook-test', {
       method: 'POST',
       body: formData,
       headers: {
