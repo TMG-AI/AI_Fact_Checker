@@ -115,49 +115,11 @@ export default async function handler(req, res) {
       console.error('⚠️ Webhook error (continuing anyway):', err.message);
     });
 
-    console.log('🌐 Sending to webhook and waiting for response...');
-
-// Send to your webhook and wait for response
-const renderResponse = await fetch('https://eb8a-2601-43-4101-9a90-bd0a-e66b-e3c5-ff5e.ngrok-free.app/webhook/webhook-test', {
-  method: 'POST',
-  body: formData,
-  headers: {
-    ...formData.getHeaders(),
-  },
-});
-
-    console.log('📊 Webhook response:', renderResponse.status, renderResponse.statusText);
-
-    if (!renderResponse.ok) {
-      const errorText = await renderResponse.text();
-      console.error('❌ Webhook failed:', renderResponse.status, errorText);
-      return res.status(500).json({ 
-        error: 'Analysis failed', 
-        details: errorText,
-        status: renderResponse.status 
-      });
-    }
-
-    // Get the complete response data
-    const responseText = await renderResponse.text();
-    console.log('📥 Webhook response text length:', responseText.length);
-    
-    let responseData;
-    
-    try {
-      responseData = JSON.parse(responseText);
-      console.log('✅ JSON parsed successfully');
-    } catch (parseError) {
-      console.error('❌ JSON parse failed:', parseError.message);
-      console.log('Raw response preview:', responseText.substring(0, 500));
-      return res.status(500).json({ 
-        error: 'Invalid response format',
-        rawResponse: responseText.substring(0, 1000)
-      });
-    }
-
-    console.log('✅ Success! Returning analysis results to frontend');
-    return res.status(200).json(responseData);
+    console.log('✅ Webhook triggered successfully!');
+    return res.status(200).json({ 
+      message: 'Analysis started!',
+      status: 'processing'
+    });
 
   } catch (error) {
     console.error('💥 Caught error:', error.message);
