@@ -3,13 +3,16 @@ import Busboy from 'busboy';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
 
-// Increase function timeout (requires Vercel Pro plan)
-export const config = {
+// Use CommonJS syntax for Vercel API routes
+const config = {
   api: {
     bodyParser: false,
-    maxDuration: 300, // 5 minutes (Pro plan)
+    maxDuration: 300, // 5 minutes with Pro + Fluid Compute
   },
 };
+
+// Export the config at the bottom of the file
+module.exports.config = config;
 
 export default async function handler(req, res) {
   console.log('🚀 API called - Method:', req.method);
