@@ -255,7 +255,9 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
-        }
+        .summary-stats {
+    margin-bottom: 5rem;
+}
         /* Features Section */
         .features {
             padding: 40px 0;
@@ -835,12 +837,12 @@ function generateDashboardHTML(data) {
     <!-- Summary Stats -->
         <div class="summary-stats">
             <div class="stat-item">
-                <span class="stat-label">Total Claims:</span>
-                <span class="stat-value">${data.summary.totalClaims}</span>
+                <span class="stat-label"><strong>Total Claims:</strong></span>
+                <span class="stat-value"><strong>${data.summary.totalClaims}</strong></span>
             </div>
             <div class="stat-item">
-                <span class="stat-label">Sources Used:</span>
-                <span class="stat-value">${data.summary.sourcesUsed}</span>
+                <span class="stat-label"><strong>Sources Used:</strong></span>
+                <span class="stat-value"><strong>${data.summary.sourcesUsed}</strong></span>
             </div>
         </div>
     <div class="verdict-cards">
