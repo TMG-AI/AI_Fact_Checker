@@ -2,6 +2,7 @@
 import Busboy from 'busboy';
 import FormData from 'form-data';
 import fetch from 'node-fetch';
+import zlib from 'zlib';
 
 // ES module config declaration (only one needed)
 export const config = {
@@ -143,7 +144,17 @@ export default async function handler(req, res) {
 
     console.log('✅ Success! Returning analysis results to frontend');
     console.log('📊 Returning data for document:', responseData[0]?.summary?.documentTitle);
-    return res.status(200).json(responseData[0]);
+    
+    // Compress the response to handle large payloads
+    const jsonString = JSON.stringify(responseData[0]);
+    console.log('📏 Response size before compression:', jsonString.length, 'bytes');
+    
+    const compressedData = zlib.gzipSync(jsonString);
+    console.log('📏 Response size after compression:', compressedData.length, 'bytes');
+    
+    res.setHeader('Content-Encoding', 'gzip');
+    res.setHeader('Content-Type', 'application/json');
+    return res.send(compressedData);
 
   } catch (error) {
     console.error('💥 Caught error:', error.message);
