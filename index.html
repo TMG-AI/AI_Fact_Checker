@@ -831,32 +831,23 @@ function displayResults(reportData) {
 function generateDashboardHTML(data) {
     return `
         <div class="dashboard">
-            <h2>Fact Check Summary</h2>
-            <div class="document-meta">
-                <h3>Document Details</h3>
-                <div class="meta-grid">
-                    <div class="dashboard">
-<h2>Fact Check Summary</h2>
-<div class="document-meta">
-<div class="meta-grid">
-<div class="meta-item"><span class="meta-label">Total Claims:</span><span>${data.summary.totalClaims}</span></div>
-<div class="meta-item"><span class="meta-label">Sources Used:</span><span>${data.summary.sourcesUsed}</span></div>
-</div>
-                    <div class="meta-item"><span class="meta-label">Sources Used:</span><span>${data.summary.sourcesUsed}</span></div>
-                    <div class="meta-item"><span class="meta-label">Date:</span><span>${data.summary.reportDate}</span></div>
-                </div>
-            </div>
-            <div class="verdict-cards">
-                <div class="verdict-card true"><div class="verdict-number">${data.verdictCounts.true}</div><div class="verdict-label">True</div></div>
-                <div class="verdict-card partially-true"><div class="verdict-number">${data.verdictCounts.partial}</div><div class="verdict-label">Partially True</div></div>
-                <div class="verdict-card false"><div class="verdict-number">${data.verdictCounts.false}</div><div class="verdict-label">False</div></div>
-                <div class="verdict-card unverifiable"><div class="verdict-number">${data.verdictCounts.unverifiable}</div><div class="verdict-label">Unverifiable</div></div>
-            </div>
-            <div class="quick-actions">
-                <div class="quick-actions" style="text-align: center;"> <button class="action-btn" onclick="downloadPDF()">Download Full Report</button> </div>
-            </div>
+    <h2>Fact Check Summary</h2>
+    <div class="document-meta">
+        <div class="meta-grid">
+            <div class="meta-item"><span class="meta-label">Total Claims:</span><span>${data.summary.totalClaims}</span></div>
+            <div class="meta-item"><span class="meta-label">Sources Used:</span><span>${data.summary.sourcesUsed}</span></div>
         </div>
-    `;
+    </div>
+    <div class="verdict-cards">
+        <div class="verdict-card true"><div class="verdict-number">${data.verdictCounts.true}</div><div class="verdict-label">True</div></div>
+        <div class="verdict-card partially-true"><div class="verdict-number">${data.verdictCounts.partial}</div><div class="verdict-label">Partially True</div></div>
+        <div class="verdict-card false"><div class="verdict-number">${data.verdictCounts.false}</div><div class="verdict-label">False</div></div>
+        <div class="verdict-card unverifiable"><div class="verdict-number">${data.verdictCounts.unverifiable}</div><div class="verdict-label">Unverifiable</div></div>
+    </div>
+    <div class="quick-actions" style="text-align: center;">
+        <button class="action-btn" onclick="downloadPDF()">Download Full Report</button>
+    </div>
+</div>    `;
     
 }
 
